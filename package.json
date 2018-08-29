@@ -1,6 +1,6 @@
 {
   "name": "cloudrest.bitcoin.com",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "REST API for Bitcoin.com's Cloud",
   "main": "index.js",
   "scripts": {

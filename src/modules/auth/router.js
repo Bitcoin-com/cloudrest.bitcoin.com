@@ -12,5 +12,40 @@ module.exports.routes = [
     handlers: [
       auth.authUser
     ]
+  },
+  {
+    method: 'POST',
+    route: '/login',
+    handlers: [
+      auth.login
+    ]
+  },
+  {
+    method: 'POST',
+    route: '/logout',
+    handlers: [
+      auth.logout
+    ]
+  },
+  {
+    method: 'GET',
+    route: '/2fa',
+    handlers: [
+      auth.twofa
+    ]
+  },
+  {
+    method: 'GET',
+    route: '/token',
+    handlers: [
+      auth.token
+    ]
+  },
+  {
+    method: 'GET',
+    route: '/whoami',
+    handlers: [
+      auth.whoami
+    ]
   }
 ]

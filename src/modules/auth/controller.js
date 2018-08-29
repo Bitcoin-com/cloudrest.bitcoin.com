@@ -69,4 +69,76 @@ async function authUser (ctx, next) {
   })(ctx, next)
 }
 
+async function login (ctx, next) {
+  return passport.authenticate('local', (user) => {
+    // if (!user) {
+    //   ctx.throw(401)
+    // }
+
+    ctx.status = 200;
+    ctx.body = {
+      success: 'login'
+    }
+  })(ctx, next)
+}
+
+async function logout (ctx, next) {
+  return passport.authenticate('local', (user) => {
+    // if (!user) {
+    //   ctx.throw(401)
+    // }
+
+    ctx.status = 200;
+    ctx.body = {
+      success: 'logout'
+    }
+  })(ctx, next)
+}
+
+async function twofa (ctx, next) {
+  return passport.authenticate('local', (user) => {
+    // if (!user) {
+    //   ctx.throw(401)
+    // }
+
+    ctx.status = 200;
+    ctx.body = {
+      success: 'twofa'
+    }
+  })(ctx, next)
+}
+
+async function token (ctx, next) {
+  return passport.authenticate('local', (user) => {
+    // if (!user) {
+    //   ctx.throw(401)
+    // }
+
+    ctx.status = 200;
+    ctx.body = {
+      success: 'token'
+    }
+  })(ctx, next)
+}
+
+
+async function whoami (ctx, next) {
+  return passport.authenticate('local', (user) => {
+    // if (!user) {
+    //   ctx.throw(401)
+    // }
+
+    ctx.status = 200;
+    ctx.body = {
+      success: 'whoami'
+    }
+  })(ctx, next)
+}
+
+
 module.exports.authUser = authUser
+module.exports.login = login
+module.exports.logout = logout
+module.exports.twofa = twofa
+module.exports.token = token
+module.exports.whoami = whoami
