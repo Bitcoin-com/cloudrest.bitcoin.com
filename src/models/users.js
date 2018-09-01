@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
 const config = require('../../config')
 const jwt = require('jsonwebtoken')
@@ -6,6 +7,7 @@ const jwt = require('jsonwebtoken')
 const User = new mongoose.Schema({
   type: { type: String, default: 'User' },
   name: { type: String },
+  nodes: [{ type: Schema.Types.ObjectId, ref: 'Node' }],
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }
 })
