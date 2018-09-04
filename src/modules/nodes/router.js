@@ -5,19 +5,35 @@ module.exports.baseUrl = '/nodes'
 
 module.exports.routes = [
   {
-    method: 'GET',
-    route: '/',
-    handlers: [
-      ensureUser,
-      nodes.list
-    ]
-  },
-  {
     method: 'POST',
     route: '/',
     handlers: [
       ensureUser,
-      nodes.create
+      nodes.createNode
+    ]
+  },
+  {
+    method: 'GET',
+    route: '/',
+    handlers: [
+      ensureUser,
+      nodes.getNodes
+    ]
+  },
+  {
+    method: 'GET',
+    route: '/:name',
+    handlers: [
+      ensureUser,
+      nodes.getNode
+    ]
+  },
+  {
+    method: 'PUT',
+    route: '/:name',
+    handlers: [
+      ensureUser,
+      nodes.updateNode
     ]
   },
   {
@@ -25,7 +41,7 @@ module.exports.routes = [
     route: '/:name',
     handlers: [
       ensureUser,
-      nodes.remove
+      nodes.deleteNode
     ]
   },
 ]

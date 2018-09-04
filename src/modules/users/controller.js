@@ -38,7 +38,8 @@ const User = require('../../models/users')
  *       "error": "Unprocessable Entity"
  *     }
  */
-async function createUser (ctx) {
+ 
+let createUser = async (ctx) => {
   const user = new User(ctx.request.body.user)
   try {
     await user.save()
@@ -84,7 +85,7 @@ async function createUser (ctx) {
  *
  * @apiUse TokenError
  */
-async function getUsers (ctx) {
+let getUsers = async (ctx) => {
   const users = await User.find({}, '-password')
   ctx.body = { users }
 }
@@ -116,7 +117,7 @@ async function getUsers (ctx) {
  *
  * @apiUse TokenError
  */
-async function getUser (ctx, next) {
+let getUser = async (ctx, next) => {
   try {
     const user = await User.findById(ctx.params.id, '-password')
     if (!user) {
@@ -177,7 +178,7 @@ async function getUser (ctx, next) {
  *
  * @apiUse TokenError
  */
-async function updateUser (ctx) {
+let updateUser = async (ctx) => {
   const user = ctx.body.user
 
   Object.assign(user, ctx.request.body.user)
@@ -210,7 +211,7 @@ async function updateUser (ctx) {
  * @apiUse TokenError
  */
 
-async function deleteUser (ctx) {
+let deleteUser = async (ctx) => {
   const user = ctx.body.user
 
   await user.remove()

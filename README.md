@@ -16,10 +16,10 @@ Install the deps
 
 Start the app
 
-* `npm start` Start server on live mode
-* `npm run dev` Start server on dev mode with nodemon
-* `npm run docs` Generate API documentation
-* `npm test` Run mocha tests
+* `yarn start` Start server on live mode
+* `yarn run dev` Start server on dev mode with nodemon
+* `yarn run docs` Generate API documentation
+* `yarn test` Run mocha tests
 
 ## Documentation
 

@@ -10,80 +10,22 @@ const LOCALHOST = 'http://localhost:5000'
 should()
 const context = {}
 
-describe('#Users', () => {
+describe('#Nodes', () => {
   before(async () => {
     utils.cleanDb()
   })
 
-  describe('POST /users', () => {
-    it('should reject signup when data is incomplete', async () => {
-      try {
-        const options = {
-          method: 'POST',
-          uri: `${LOCALHOST}/users`,
-          resolveWithFullResponse: true,
-          json: true,
-          body: {
-            username: 'supercoolname'
-          }
-        }
-
-        let result = await rp(options)
-
-        console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
-        assert(false, 'Unexpected result')
-      } catch (err) {
-        if (err.statusCode === 422) {
-          assert(err.statusCode === 422, 'Error code 422 expected.')
-        } else if (err.statusCode === 401) {
-          assert(err.statusCode === 401, 'Error code 401 expected.')
-        } else {
-          console.error('Error: ', err)
-          console.log('Error stringified: ' + JSON.stringify(err, null, 2))
-          throw err
-        }
-      }
-    })
-
-    it('should sign up', async () => {
-      try {
-        const options = {
-          method: 'POST',
-          uri: `${LOCALHOST}/users`,
-          resolveWithFullResponse: true,
-          json: true,
-          body: {
-            user: { username: 'supercoolname', password: 'supersecretpassword' }
-          }
-        }
-
-        let result = await rp(options)
-
-        result.body.user.should.have.property('username')
-        result.body.user.username.should.equal('supercoolname')
-        expect(result.body.user.password).to.not.exist
-
-        context.user = result.body.user
-        context.token = result.body.token
-
-      } catch (err) {
-        console.log('Error authenticating test user: ' + JSON.stringify(err, null, 2))
-        throw err
-      }
-    })
-  })
-/*
-  describe('GET /users', () => {
-    it('should not fetch users if the authorization header is missing', (done) => {
+  describe('GET /nodes', () => {
+    it('should not fetch nodes if the authorization header is missing', (done) => {
       request
-        .get('/users')
+        .get('/nodes')
         .set('Accept', 'application/json')
         .expect(401, done)
     })
 
-    it('should not fetch users if the authorization header is missing the scheme', (done) => {
+    it('should not fetch nodes if the authorization header is missing the scheme', (done) => {
       request
-        .get('/users')
+        .get('/nodes')
         .set({
           Accept: 'application/json',
           Authorization: '1'
@@ -91,10 +33,10 @@ describe('#Users', () => {
         .expect(401, done)
     })
 
-    it('should not fetch users if the authorization header has invalid scheme', (done) => {
+    it('should not fetch nodes if the authorization header has invalid scheme', (done) => {
       const { token } = context
       request
-        .get('/users')
+        .get('/nodes')
         .set({
           Accept: 'application/json',
           Authorization: `Unknown ${token}`
@@ -102,9 +44,9 @@ describe('#Users', () => {
         .expect(401, done)
     })
 
-    it('should not fetch users if token is invalid', (done) => {
+    it('should not fetch nodes if token is invalid', (done) => {
       request
-        .get('/users')
+        .get('/nodes')
         .set({
           Accept: 'application/json',
           Authorization: 'Bearer 1'
@@ -112,10 +54,10 @@ describe('#Users', () => {
         .expect(401, done)
     })
 
-    it('should fetch all users', (done) => {
+    it('should fetch all nodes', (done) => {
       const { token } = context
       request
-        .get('/users')
+        .get('/nodes')
         .set({
           Accept: 'application/json',
           Authorization: `Bearer ${token}`
@@ -123,16 +65,16 @@ describe('#Users', () => {
         .expect(200, (err, res) => {
           if (err) { return done(err) }
 
-          res.body.should.have.property('users')
+          res.body.should.have.property('nodes')
 
-          res.body.users.should.have.length(1)
+          res.body.nodes.should.have.length(1)
 
           done()
         })
     })
   })
 
-  describe('GET /users/:id', () => {
+  describe('GET /nodes/:name', () => {
     it('should not fetch user if token is invalid', (done) => {
       request
         .get('/users/1')
@@ -161,7 +103,7 @@ describe('#Users', () => {
       } = context
 
       request
-        .get(`/users/${_id}`)
+        .get(`/nodes/${_id}`)
         .set({
           Accept: 'application/json',
           Authorization: `Bearer ${token}`
@@ -180,10 +122,10 @@ describe('#Users', () => {
     })
   })
 
-  describe('PUT /users/:id', () => {
+  describe('PUT /nodes/:name', () => {
     it('should not update user if token is invalid', (done) => {
       request
-        .put('/users/1')
+        .put('/nodes/1')
         .set({
           Accept: 'application/json',
           Authorization: 'Bearer 1'
@@ -194,7 +136,7 @@ describe('#Users', () => {
     it('should throw 404 if user doesn\'t exist', (done) => {
       const { token } = context
       request
-        .put('/users/1')
+        .put('/nodes/1')
         .set({
           Accept: 'application/json',
           Authorization: `Bearer ${token}`
@@ -227,7 +169,7 @@ describe('#Users', () => {
     })
   })
 
-  describe('DELETE /users/:id', () => {
+  describe('DELETE /nodes/:name', () => {
     it('should not delete user if token is invalid', (done) => {
       request
         .delete('/users/1')
@@ -265,5 +207,4 @@ describe('#Users', () => {
     })
 
   })
-  */
 })

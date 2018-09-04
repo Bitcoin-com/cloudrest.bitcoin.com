@@ -12,7 +12,7 @@ const User = new mongoose.Schema({
   password: { type: String, required: true }
 })
 
-User.pre('save', function preSave (next) {
+User.pre('save', (next) => {
   const user = this
 
   if (!user.isModified('password')) {
@@ -37,7 +37,7 @@ User.pre('save', function preSave (next) {
   .catch(err => next(err))
 })
 
-User.methods.validatePassword = function validatePassword (password) {
+User.methods.validatePassword = (password) => {
   const user = this
 
   return new Promise((resolve, reject) => {
@@ -49,7 +49,7 @@ User.methods.validatePassword = function validatePassword (password) {
   })
 }
 
-User.methods.generateToken = function generateToken () {
+User.methods.generateToken = () => {
   const user = this
 
   const token = jwt.sign({ id: user.id }, config.token)

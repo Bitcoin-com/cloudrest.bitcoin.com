@@ -50,7 +50,7 @@ const passport = require('koa-passport')
  *     }
  */
 
-async function authUser (ctx, next) {
+let authUser = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     if (!user) {
       ctx.throw(401)
@@ -69,7 +69,7 @@ async function authUser (ctx, next) {
   })(ctx, next)
 }
 
-async function login (ctx, next) {
+let login = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     // if (!user) {
     //   ctx.throw(401)
@@ -82,7 +82,7 @@ async function login (ctx, next) {
   })(ctx, next)
 }
 
-async function logout (ctx, next) {
+let logout = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     // if (!user) {
     //   ctx.throw(401)
@@ -95,7 +95,7 @@ async function logout (ctx, next) {
   })(ctx, next)
 }
 
-async function twofa (ctx, next) {
+let twofa = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     // if (!user) {
     //   ctx.throw(401)
@@ -108,7 +108,7 @@ async function twofa (ctx, next) {
   })(ctx, next)
 }
 
-async function token (ctx, next) {
+let token = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     // if (!user) {
     //   ctx.throw(401)
@@ -122,7 +122,7 @@ async function token (ctx, next) {
 }
 
 
-async function whoami (ctx, next) {
+let whoami = async (ctx, next) => {
   return passport.authenticate('local', (user) => {
     // if (!user) {
     //   ctx.throw(401)
@@ -135,10 +135,11 @@ async function whoami (ctx, next) {
   })(ctx, next)
 }
 
-
-module.exports.authUser = authUser
-module.exports.login = login
-module.exports.logout = logout
-module.exports.twofa = twofa
-module.exports.token = token
-module.exports.whoami = whoami
+module.exports = {
+  authUser,
+  login,
+  logout,
+  twofa,
+  token,
+  whoami
+}
