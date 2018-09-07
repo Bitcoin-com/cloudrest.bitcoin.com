@@ -7,12 +7,15 @@ const jwt = require('jsonwebtoken')
 const User = new mongoose.Schema({
   type: { type: String, default: 'User' },
   name: { type: String },
-  nodes: [{ type: Schema.Types.ObjectId, ref: 'Node' }],
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  email: { type: String, required: true, unique: true },
+  email_confirmed: { type: Boolean },
+  password: { type: String, required: true },
+  nodes: [{ type: Schema.Types.ObjectId, ref: 'Node' }],
+  created_at: { type: Date, default: Date.now },
 })
 
-User.pre('save', (next) => {
+User.pre('save', function(next) {
   const user = this
 
   if (!user.isModified('password')) {
@@ -37,7 +40,7 @@ User.pre('save', (next) => {
   .catch(err => next(err))
 })
 
-User.methods.validatePassword = (password) => {
+User.methods.validatePassword = function(password) {
   const user = this
 
   return new Promise((resolve, reject) => {
@@ -49,7 +52,7 @@ User.methods.validatePassword = (password) => {
   })
 }
 
-User.methods.generateToken = () => {
+User.methods.generateToken = function() {
   const user = this
 
   const token = jwt.sign({ id: user.id }, config.token)
