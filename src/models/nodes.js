@@ -6,7 +6,13 @@ const Node = new mongoose.Schema({
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
   name: { type: String, required: true },
   flavor: { type: String, required: true },
-  created: { type: Date, default: Date.now },
+  ip_address: { type: String },
+  tier: { type: String },
+  private: { type: Boolean, required: true },
+  services: [{ type: Schema.Types.Mixed }],
+  status: { type: String, required: true },
+  invoices: [{ type: Schema.Types.ObjectId, ref: 'Invoice' }],
+  created_at: { type: Date, default: Date.now },
 })
 
 module.exports = mongoose.model('node', Node)
