@@ -8,7 +8,8 @@
     "dev": "./node_modules/.bin/nodemon index.js",
     "test": "NODE_ENV=test ./node_modules/.bin/mocha",
     "lint": "eslint src/**/*.js",
-    "docs": "./node_modules/.bin/apidoc -i src/ -o docs"
+    "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
+    "seed": "node seed-db.js"
   },
   "keywords": [
     "koa2-api-boilerplate",
@@ -58,6 +59,7 @@
     "eslint-plugin-promise": "^2.0.1",
     "eslint-plugin-standard": "^2.0.0",
     "mocha": "^3.0.2",
+    "mongoose-seed": "^0.5.1",
     "nodemon": "^1.8.1",
     "supertest": "^2.0.0"
   }
