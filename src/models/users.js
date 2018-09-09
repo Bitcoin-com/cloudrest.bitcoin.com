@@ -62,4 +62,4 @@ User.methods.generateToken = function() {
 }
 
 // export default mongoose.model('user', User)
-module.exports = mongoose.model('user', User)
+module.exports = mongoose.model('User', User)

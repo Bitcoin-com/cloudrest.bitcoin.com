@@ -4,14 +4,13 @@ const seeder = require('mongoose-seed')
 // Data array containing seed data - documents organized by Model
 let data = [
   {
-    'model': 'appsettings',
+    'model': 'Appsettings',
     'documents': [
       {
         'env': 'development',
         'node_defaults': {
           flavor: 'bu.0.18.0',
           tier: 'standard',
-          status: 'pending',
           private: true,
           services: ['rest'],
         },
@@ -38,7 +37,7 @@ seeder.connect(config.database, function() {
   ])
  
   // Clear specified collections
-  seeder.clearModels(['appsettings', 'invoice', 'node', 'user'], function() {
+  seeder.clearModels(['Appsettings', 'Invoice', 'Node', 'User'], function() {
 
     // Callback to populate DB once collections have been cleared
     seeder.populateModels(data, function() {
