@@ -1,0 +1,34 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "#{NODE_NAME}#-deploy"
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "app": "#{NODE_NAME}#-app"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "#{NODE_NAME}#-app"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "image": "alpine",
+            "name": "#{NODE_NAME}#",
+            "command": ["/bin/sh"],
+            "args": ["-c", "while true; do date >> /var/log/app.txt; sleep 10;done"]
+          }
+        ]
+      }
+    }
+  }
+}
