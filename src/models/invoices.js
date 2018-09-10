@@ -23,4 +23,4 @@ Invoice.methods.toJSON = function() {
   return invoice
 }
 
-module.exports = mongoose.model('invoice', Invoice)
+module.exports = mongoose.model('Invoice', Invoice)

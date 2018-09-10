@@ -23,4 +23,4 @@ Appsettings.statics.getAppsettingsForEnv = async function() {
   return await this.findOne({env: env}).exec()
 }
 
-module.exports = mongoose.model('appsettings', Appsettings)
+module.exports = mongoose.model('Appsettings', Appsettings)
