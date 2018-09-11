@@ -12,6 +12,7 @@ const Node = new mongoose.Schema({
   services: [{ type: Schema.Types.Mixed }],
   status: { type: String, required: true, default: 'pending:new' },
   invoices: [{ type: Schema.Types.ObjectId, ref: 'Invoice' }],
+  data_disk_name: { type: String },
   created_at: { type: Date, default: Date.now },
 })
 
