@@ -8,15 +8,15 @@ const User = require('../src/models/users')
 const Invoice = require('../src/models/invoices')
 const Appsettings = require('../src/models/appsettings')
 const utils = require('./utils')
+const gcloudDisks = require('./gcloud-disks')
 
-async function start() {
+async function main() {
   mongoose.Promise = global.Promise
   mongoose.set('useCreateIndex', true)
   await mongoose.connect(config.database, { useNewUrlParser: true })
 
   await processInvoices()
   await processNodes()
-  await processExpiringNodes()
   mongoose.disconnect()
 }
 
@@ -34,23 +34,50 @@ async function processNodes() {
     // Determine global node name
     const globalNodeName = `${node._user.username}-${node.name}`.toLowerCase()
 
+    // Fetch current appsettings
+    const appsettings = await Appsettings.getAppsettingsForEnv()
+    const project = appsettings.gcloud.project
+    const zone = appsettings.gcloud.zone
+
     switch(node.status) {
       case 'pending:new':
+        // Update node status
+        node.status = 'pending:cloning'
+        await node.save()
+
+        // New disk configuration
+        const newDiskName = `bc-${globalNodeName}`
+        const pruned = appsettings.node_defaults.pruned
+        const diskSizeGb = pruned ? appsettings.node_defaults.disk_size_gb_pruned : appsettings.node_defaults.disk_size_gb_full
+        const sourceSnapshot = appsettings.source_blockchain_snapshot
+
+        // Create disk
+        let createDiskRes = await gcloudDisks.createDiskFromSnapshot(project, zone, newDiskName, diskSizeGb, sourceSnapshot)
+
+        // Update node's data disk name
+        node.data_disk_name = newDiskName
+        await node.save()
+
+        break
+      case 'pending:cloning':
+        // Wait for cloning to complete
+        let isDiskReady = await gcloudDisks.isDiskReady(project, zone, node.data_disk_name)
+        if (!isDiskReady) {
+          break
+        }
+
         // Update node status
         node.status = 'pending:deploying'
         await node.save()
 
         // Create deployment config files for node
-        const deploymentTemplate = 'kube-templates/deployment.json'
-        const fromTokens = [/#\{NODE_NAME\}#/g]
-        const toValues = [globalNodeName]
+        const deploymentTemplate = 'kube-templates/bch-deployment.json'
+        const fromTokens = [/#\{NODE_NAME\}#/g, /#\{DATA_DISK_NAME\}#/g]
+        const toValues = [globalNodeName, node.data_disk_name]
         const deploymentManifest = await utils.getKubeConfig(deploymentTemplate, fromTokens, toValues)
-        const create = await kubeClient.apis.apps.v1.namespaces('default').deployments.post({ body: deploymentManifest })
 
-        break
-      case 'pending:cloning':
-        node.status = 'pending:deploying'
-        await node.save()
+        // Deploy node
+        const create = await kubeClient.apis.apps.v1.namespaces('default').deployments.post({ body: deploymentManifest })
         
         break
       case 'pending:deploying':
@@ -72,4 +99,7 @@ async function processNodes() {
 async function processExpiringNodes() {
 }
 
-start()
+async function processTaskTimeouts() {
+}
+
+main().catch(console.error)
