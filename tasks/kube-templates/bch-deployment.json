@@ -47,7 +47,7 @@
 								}
 							}
 						],
-						"image": "zquestz/bitcoin-abc",
+						"image": "#{NODE_IMAGE}#",
 						"name": "bitcoin",
 						"volumeMounts": [
 							{
