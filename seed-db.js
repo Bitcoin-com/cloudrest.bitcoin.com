@@ -9,7 +9,7 @@ let data = [
       {
         env: 'development',
         node_defaults: {
-          flavor: 'bu.1.4.0.0',
+          flavor: 'bu',
           tier: 'standard',
           private: true,
           services: ['rest'],
@@ -18,7 +18,40 @@ let data = [
           disk_size_gb_full: '220',
           disk_size_gb_pruned: '20',
         },
-        node_flavors: ['abc.0.18.0', 'bu.1.4.0.0'],
+        node_flavors: [
+          {
+            name: 'abc',
+            image: 'zquestz/bitcoin-abc',
+          },
+          {
+            name: 'bu',
+            image: 'zquestz/bitcoin-unlimited',
+          },
+          {
+            name: 'xt',
+            image: 'zquestz/bitcoin-xt',
+          },
+          {
+            name: 'wormhole',
+            image: '',
+            defaults: {
+              services: ['rest', 'wormhole-rest']
+            }
+          },
+          {
+            name: 'no-node',
+            image: '',
+          },
+        ],
+        source_blockchain_snapshot: 'bch-data-2018-09-13t01-10-19-154z',
+        source_blockchain_deploy: 'source-blockchain-deploy',
+        source_blockchain_disk: 'source-blockchain-disk',
+        services: [
+          {
+            name: 'rest',
+            image: '',
+          },
+        ],
         usd_per_minute: '0.001',
         minimum_billing_days: 7,
         notify_user_node_expiration_days: 30,
@@ -28,7 +61,6 @@ let data = [
           project: 'bitbox-cloud-stage',
           zone: 'us-central1-a',
         },
-        source_blockchain_snapshot: 'bitcoin-data-snapshot-1',
       },
     ]
   },
