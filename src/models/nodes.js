@@ -13,6 +13,7 @@ const Node = new mongoose.Schema({
   status: { type: String, required: true, default: 'pending:new' },
   invoices: [{ type: Schema.Types.ObjectId, ref: 'Invoice' }],
   data_disk_name: { type: String },
+  image: { type: String },
   created_at: { type: Date, default: Date.now },
 })
 
