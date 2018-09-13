@@ -1,4 +1,5 @@
-const User = require('../../models/users')
+"use strict";
+const User = require("../../models/users");
 
 /**
  * @api {post} /users Create a new user
@@ -38,25 +39,25 @@ const User = require('../../models/users')
  *       "error": "Unprocessable Entity"
  *     }
  */
- 
-let createUser = async (ctx) => {
-  const user = new User(ctx.request.body.user)
+
+const createUser = async ctx => {
+  const user = new User(ctx.request.body.user);
   try {
-    await user.save()
+    await user.save();
   } catch (err) {
-    ctx.throw(422, err.message)
+    ctx.throw(422, err.message);
   }
 
-  const token = user.generateToken()
-  const response = user.toJSON()
+  const token = user.generateToken();
+  const response = user.toJSON();
 
-  delete response.password
+  delete response.password;
 
   ctx.body = {
     user: response,
     token
-  }
-}
+  };
+};
 
 /**
  * @api {get} /users Get all users
@@ -85,10 +86,10 @@ let createUser = async (ctx) => {
  *
  * @apiUse TokenError
  */
-let getUsers = async (ctx) => {
-  const users = await User.find({}, '-password')
-  ctx.body = { users }
-}
+const getUsers = async ctx => {
+  const users = await User.find({}, "-password");
+  ctx.body = { users };
+};
 
 /**
  * @api {get} /users/:id Get user by id
@@ -117,26 +118,22 @@ let getUsers = async (ctx) => {
  *
  * @apiUse TokenError
  */
-let getUser = async (ctx, next) => {
+const getUser = async (ctx, next) => {
   try {
-    const user = await User.findById(ctx.params.id, '-password')
-    if (!user) {
-      ctx.throw(404)
-    }
+    const user = await User.findById(ctx.params.id, "-password");
+    if (!user) ctx.throw(404);
 
     ctx.body = {
       user
-    }
+    };
   } catch (err) {
-    if (err === 404 || err.name === 'CastError') {
-      ctx.throw(404)
-    }
+    if (err === 404 || err.name === "CastError") ctx.throw(404);
 
-    ctx.throw(500)
+    ctx.throw(500);
   }
 
-  if (next) { return next() }
-}
+  if (next) return next();
+};
 
 /**
  * @api {put} /users/:id Update a user
@@ -178,17 +175,17 @@ let getUser = async (ctx, next) => {
  *
  * @apiUse TokenError
  */
-let updateUser = async (ctx) => {
-  const user = ctx.body.user
+const updateUser = async ctx => {
+  const user = ctx.body.user;
 
-  Object.assign(user, ctx.request.body.user)
+  Object.assign(user, ctx.request.body.user);
 
-  await user.save()
+  await user.save();
 
   ctx.body = {
     user
-  }
-}
+  };
+};
 
 /**
  * @api {delete} /users/:id Delete a user
@@ -210,17 +207,16 @@ let updateUser = async (ctx) => {
  *
  * @apiUse TokenError
  */
+const deleteUser = async ctx => {
+  const user = ctx.body.user;
 
-let deleteUser = async (ctx) => {
-  const user = ctx.body.user
+  await user.remove();
 
-  await user.remove()
-
-  ctx.status = 200
+  ctx.status = 200;
   ctx.body = {
     success: true
-  }
-}
+  };
+};
 
 module.exports = {
   createUser,
@@ -228,4 +224,4 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser
-}
+};

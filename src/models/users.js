@@ -12,10 +12,10 @@ const User = new mongoose.Schema({
   email_confirmed: { type: Boolean },
   password: { type: String, required: true },
   nodes: [{ type: Schema.Types.ObjectId, ref: 'Node' }],
-  created_at: { type: Date, default: Date.now },
+  created_at: { type: Date, default: Date.now }
 })
 
-User.pre('save', function(next) {
+User.pre('save', function (next) {
   const user = this
 
   if (!user.isModified('password')) {
@@ -40,7 +40,7 @@ User.pre('save', function(next) {
   .catch(err => next(err))
 })
 
-User.methods.validatePassword = function(password) {
+User.methods.validatePassword = function (password) {
   const user = this
 
   return new Promise((resolve, reject) => {
@@ -52,12 +52,12 @@ User.methods.validatePassword = function(password) {
   })
 }
 
-User.methods.generateToken = function() {
+User.methods.generateToken = function () {
   const user = this
 
   const token = jwt.sign({ id: user.id }, config.token)
-  //console.log(`config.token: ${config.token}`)
-  //console.log(`generated token: ${token}`)
+  // console.log(`config.token: ${config.token}`)
+  // console.log(`generated token: ${token}`)
   return token
 }
 

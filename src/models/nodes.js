@@ -14,7 +14,7 @@ const Node = new mongoose.Schema({
   invoices: [{ type: Schema.Types.ObjectId, ref: 'Invoice' }],
   data_disk_name: { type: String },
   image: { type: String },
-  created_at: { type: Date, default: Date.now },
+  created_at: { type: Date, default: Date.now }
 })
 
 module.exports = mongoose.model('Node', Node)
