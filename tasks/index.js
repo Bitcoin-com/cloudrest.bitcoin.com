@@ -102,7 +102,9 @@ async function processNodes() {
         break
       case 'pending:backup':
         // Backup data disk
-        await gcloudDisks.createSnapshotFromDisk(project, zone, node.name.toLowerCase(), node.data_disk_name)
+        const now = moment()
+        const snapshotName = `${globalNodeName}-${now.toISOString().toLowerCase().replace(/\:|\./g, '-')}`
+        await gcloudDisks.createSnapshotFromDisk(project, zone, snapshotName, node.data_disk_name)
 
         // Backup config disk
 
@@ -122,7 +124,7 @@ async function processNodes() {
         break
       case 'pending:deleteDisk':
         // Verify disk is detached to continue
-        const isDiskAttached = await gcloudDisks.isDiskAttached(project, zone, sourceDiskName)
+        const isDiskAttached = await gcloudDisks.isDiskAttached(project, zone, node.data_disk_name)
         if (isDiskAttached) {
           break
         }
@@ -201,4 +203,4 @@ async function processExpiringNodes() {
 async function processTaskTimeouts() {
 }
 
-main().catch(console.error)
+main()
