@@ -25,7 +25,10 @@
             "image": "alpine",
             "name": "#{NODE_NAME}#",
             "command": ["/bin/sh"],
-            "args": ["-c", "while true; do date >> /var/log/app.txt; sleep 10;done"]
+            "args": [
+              "-c",
+              "while true; do date >> /var/log/app.txt; sleep 10;done"
+            ]
           }
         ]
       }

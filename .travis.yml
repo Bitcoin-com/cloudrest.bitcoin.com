@@ -10,8 +10,22 @@ sudo: required
 
 # Use Docker
 services:
+  - mongodb
   - docker
 
 before_install:
-  - ./install-mongo
+  #- ./install-mongo
   #- npm install -g mocha
+
+script: "npm run test"
+
+# Send coverage data to Coveralls
+after_success:
+  - npm run coverage
+
+#deploy:
+#  provider: script
+#  skip_cleanup: true
+#  script:
+
+#    - npx semantic-release
