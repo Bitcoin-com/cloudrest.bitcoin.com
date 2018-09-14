@@ -1,9 +1,9 @@
-const passport = require('koa-passport')
-const Node = require('../../models/nodes')
-const Invoice = require('../../models/invoices')
-const Appsettings = require('../../models/appsettings')
-const getBchRate = require('../../services/price')
-const getNewPaymentAddress = require('../../services/payment-address')
+const passport = require("koa-passport");
+const Node = require("../../models/nodes");
+const Invoice = require("../../models/invoices");
+const Appsettings = require("../../models/appsettings");
+const getBchRate = require("../../services/price");
+const getNewPaymentAddress = require("../../services/payment-address");
 
 /**
  * @api {post} /nodes Create a new node
@@ -52,54 +52,57 @@ const getNewPaymentAddress = require('../../services/payment-address')
  *     }
  */
 let createNode = async (ctx, next) => {
-  return passport.authenticate('local', async (user) => {
+  return passport.authenticate("local", async user => {
     try {
-      const appsettings = await Appsettings.getAppsettingsForEnv()
-      const nodeDefaults = appsettings.node_defaults.toJSON()
+      const appsettings = await Appsettings.getAppsettingsForEnv();
+      const nodeDefaults = appsettings.node_defaults.toJSON();
       const userInput = {
         flavor: ctx.request.body.flavor,
-        name: ctx.request.body.name,
-      }
-      const nodeSettings = Object.assign({}, nodeDefaults, userInput)
+        name: ctx.request.body.name
+      };
+      const nodeSettings = Object.assign({}, nodeDefaults, userInput);
 
       const node = new Node({
-        _user: ctx.state.user._id, 
+        _user: ctx.state.user._id,
         ...nodeSettings
-      })
+      });
 
-      await node.save()
-      ctx.state.user.nodes.push(node)
-      await ctx.state.user.save()
+      await node.save();
+      ctx.state.user.nodes.push(node);
+      await ctx.state.user.save();
 
       // Create invoice for requested node
-      const currentBchRate = await getBchRate()
-      const paymentAddress = await getNewPaymentAddress()
-      const priceQuote = parseFloat(appsettings.usd_per_minute) / currentBchRate
-      let now = new Date()
-      let expiresAt = new Date(now.getTime() + appsettings.quote_valid_minutes * 60 * 1000)
+      const currentBchRate = await getBchRate();
+      const paymentAddress = await getNewPaymentAddress();
+      const priceQuote =
+        parseFloat(appsettings.usd_per_minute) / currentBchRate;
+      let now = new Date();
+      let expiresAt = new Date(
+        now.getTime() + appsettings.quote_valid_minutes * 60 * 1000
+      );
       const invoice = new Invoice({
         _node: node._id,
         bch_address: paymentAddress,
         bch_per_minute: priceQuote,
-        expires_at: expiresAt,
-      })
-      await invoice.save()
-      node.invoices.push(invoice)
-      await node.save()
+        expires_at: expiresAt
+      });
+      await invoice.save();
+      node.invoices.push(invoice);
+      await node.save();
 
-      ctx.status = 200
-      ctx.body = { 
+      ctx.status = 200;
+      ctx.body = {
         node: {
           name: node.name,
-          flavor: node.flavor,
+          flavor: node.flavor
         },
         invoice: invoice.toJSON()
-      }
+      };
     } catch (err) {
-      ctx.throw(422, err.message)
+      ctx.throw(422, err.message);
     }
-  })(ctx, next)
-}
+  })(ctx, next);
+};
 
 /**
  * @api {get} /nodes Get all nodes
@@ -132,13 +135,13 @@ let createNode = async (ctx, next) => {
  */
 let getNodes = async (ctx, next) => {
   // TODO: Get all nodes
-  return passport.authenticate('local', async (user) => {
-    const nodes = await Node.find({ _user: ctx.state.user._id })
+  return passport.authenticate("local", async user => {
+    const nodes = await Node.find({ _user: ctx.state.user._id });
 
     ctx.status = 200;
-    ctx.body = JSON.stringify(nodes)
-  })(ctx, next)
-}
+    ctx.body = JSON.stringify(nodes);
+  })(ctx, next);
+};
 
 /**
  * @api {get} /nodes/:id Get user by id
@@ -170,13 +173,13 @@ let getNodes = async (ctx, next) => {
  * @apiUse TokenError
  */
 let getNode = async (ctx, next) => {
-  return passport.authenticate('local', async (user) => {
-    const nodes = await Node.find({ _user: ctx.state.user._id })
+  return passport.authenticate("local", async user => {
+    const nodes = await Node.find({ _user: ctx.state.user._id });
 
     ctx.status = 200;
-    ctx.body = JSON.stringify(nodes)
-  })(ctx, next)
-}
+    ctx.body = JSON.stringify(nodes);
+  })(ctx, next);
+};
 
 /**
  * @api {put} /nodes/:id Update a node
@@ -221,27 +224,27 @@ let getNode = async (ctx, next) => {
  * @apiUse TokenError
  */
 
-let updateNode = async (ctx) => {
+let updateNode = async ctx => {
   // TODO: Update Node
-  const user = ctx.body.user
+  const user = ctx.body.user;
 
-  Object.assign(user, ctx.request.body.user)
+  Object.assign(user, ctx.request.body.user);
 
-  await user.save()
+  await user.save();
 
   ctx.body = {
     user
-  }
-}
+  };
+};
 
 let deleteNode = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+  return passport.authenticate("local", user => {
     ctx.status = 200;
     ctx.body = {
       success: `delete ${ctx.params.name}`
-    }
-  })(ctx, next)
-}
+    };
+  })(ctx, next);
+};
 
 module.exports = {
   createNode,
@@ -249,4 +252,4 @@ module.exports = {
   getNode,
   updateNode,
   deleteNode
-}
+};

@@ -1,78 +1,78 @@
 {
-	"apiVersion": "apps/v1",
-	"kind": "Deployment",
-	"metadata": {
-		"namespace": "default",
-		"labels": {
-			"service": "#{NODE_NAME}#-app"
-		},
-		"name": "#{NODE_NAME}#-deploy"
-	},
-	"spec": {
-		"selector": {
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "namespace": "default",
+    "labels": {
+      "service": "#{NODE_NAME}#-app"
+    },
+    "name": "#{NODE_NAME}#-deploy"
+  },
+  "spec": {
+    "selector": {
       "matchLabels": {
         "app": "#{NODE_NAME}#-app"
       }
     },
-		"strategy": {
-			"type": "Recreate"
-		},
-		"replicas": 1,
-		"template": {
-			"metadata": {
-				"labels": {
-					"app": "#{NODE_NAME}#-app"
-				}
-			},
-			"spec": {
-				"containers": [
-					{
-						"env": [
-							{
-								"name": "BITCOIN_RPC_USER",
-								"valueFrom": {
-									"secretKeyRef": {
-										"name": "bitcoin-dev-secret",
-										"key": "rpcuser"
-									}
-								}
-							},
-							{
-								"name": "BITCOIN_RPC_PASSWORD",
-								"valueFrom": {
-									"secretKeyRef": {
-										"name": "bitcoin-dev-secret",
-										"key": "rpcpass"
-									}
-								}
-							}
-						],
-						"image": "#{NODE_IMAGE}#",
-						"name": "bitcoin",
-						"volumeMounts": [
-							{
-								"mountPath": "/data",
-								"name": "bitcoin-data"
-							}
-						],
-						"resources": {
-							"requests": {
-								"memory": "1Gi"
-							}
-						}
-					}
-				],
-				"restartPolicy": "Always",
-				"volumes": [
-					{
-						"name": "bitcoin-data",
-						"gcePersistentDisk": {
-							"pdName": "#{DATA_DISK_NAME}#",
-							"fsType": "ext4"
-						}
-					}
-				]
-			}
-		}
-	}
+    "strategy": {
+      "type": "Recreate"
+    },
+    "replicas": 1,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "#{NODE_NAME}#-app"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "BITCOIN_RPC_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "bitcoin-dev-secret",
+                    "key": "rpcuser"
+                  }
+                }
+              },
+              {
+                "name": "BITCOIN_RPC_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "bitcoin-dev-secret",
+                    "key": "rpcpass"
+                  }
+                }
+              }
+            ],
+            "image": "#{NODE_IMAGE}#",
+            "name": "bitcoin",
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "bitcoin-data"
+              }
+            ],
+            "resources": {
+              "requests": {
+                "memory": "1Gi"
+              }
+            }
+          }
+        ],
+        "restartPolicy": "Always",
+        "volumes": [
+          {
+            "name": "bitcoin-data",
+            "gcePersistentDisk": {
+              "pdName": "#{DATA_DISK_NAME}#",
+              "fsType": "ext4"
+            }
+          }
+        ]
+      }
+    }
+  }
 }

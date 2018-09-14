@@ -1,4 +1,5 @@
-const passport = require('koa-passport')
+"use strict";
+const passport = require("koa-passport");
 
 /**
  * @apiDefine TokenError
@@ -50,90 +51,87 @@ const passport = require('koa-passport')
  *     }
  */
 
-let authUser = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
-    if (!user) {
-      ctx.throw(401)
-    }
+const authUser = async (ctx, next) => {
+  return passport.authenticate("local", user => {
+    if (!user) ctx.throw(401);
 
-    const token = user.generateToken()
+    const token = user.generateToken();
 
-    const response = user.toJSON()
+    const response = user.toJSON();
 
-    delete response.password
+    delete response.password;
 
     ctx.body = {
       token,
       user: response
-    }
-  })(ctx, next)
-}
+    };
+  })(ctx, next);
+};
 
-let login = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+const login = async (ctx, next) => {
+  return passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200;
     ctx.body = {
-      success: 'login'
-    }
-  })(ctx, next)
-}
+      success: "login"
+    };
+  })(ctx, next);
+};
 
-let logout = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+const logout = async (ctx, next) => {
+  return passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200;
     ctx.body = {
-      success: 'logout'
-    }
-  })(ctx, next)
-}
+      success: "logout"
+    };
+  })(ctx, next);
+};
 
-let twofa = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+const twofa = async (ctx, next) => {
+  return passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200;
     ctx.body = {
-      success: 'twofa'
-    }
-  })(ctx, next)
-}
+      success: "twofa"
+    };
+  })(ctx, next);
+};
 
-let token = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+const token = async (ctx, next) => {
+  return passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200;
     ctx.body = {
-      success: 'token'
-    }
-  })(ctx, next)
-}
+      success: "token"
+    };
+  })(ctx, next);
+};
 
-
-let whoami = async (ctx, next) => {
-  return passport.authenticate('local', (user) => {
+const whoami = async (ctx, next) => {
+  return passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200;
     ctx.body = {
-      success: 'whoami'
-    }
-  })(ctx, next)
-}
+      success: "whoami"
+    };
+  })(ctx, next);
+};
 
 module.exports = {
   authUser,
@@ -142,4 +140,4 @@ module.exports = {
   twofa,
   token,
   whoami
-}
+};
