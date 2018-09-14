@@ -1,4 +1,3 @@
-"use strict";
 const uuidv4 = require("uuid/v4");
 const replace = require("replace-in-file");
 const fs = require("fs");
