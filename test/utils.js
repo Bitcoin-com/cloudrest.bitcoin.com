@@ -15,7 +15,7 @@ function authUser(agent, callback) {
   agent
     .post("/users")
     .set("Accept", "application/json")
-    .send({ user: { username: "test", password: "pass" } })
+    .send({ user: { username: "test", email: "test@example.com", password: "pass" } })
     .end((err, res) => {
       if (err) return callback(err);
 
@@ -29,6 +29,7 @@ function authUser(agent, callback) {
 // This function is used to create new users.
 // userObj = {
 //   username,
+//   email,
 //   password
 // }
 async function createUser(userObj) {
@@ -41,6 +42,7 @@ async function createUser(userObj) {
       body: {
         user: {
           username: userObj.username,
+          email: userObj.email,
           password: userObj.password
         }
       }

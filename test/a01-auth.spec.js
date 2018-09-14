@@ -34,6 +34,7 @@ describe("#Auth", () => {
 
     const userObj = {
       username: "test",
+      email: "test@example.com",
       password: "pass"
     };
     const testUser = await utils.createUser(userObj);

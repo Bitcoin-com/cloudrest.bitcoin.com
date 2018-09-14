@@ -54,7 +54,7 @@ describe("#Users", () => {
           resolveWithFullResponse: true,
           json: true,
           body: {
-            user: { username: "supercoolname", password: "supersecretpassword" }
+            user: { username: "supercoolname", email: "supercool@example.com", password: "supersecretpassword" }
           }
         };
 
