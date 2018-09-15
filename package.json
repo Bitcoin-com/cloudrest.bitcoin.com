@@ -6,11 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "./node_modules/.bin/nodemon index.js",
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha",
-    "lint": "eslint src/**/*.js",
-    "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
-    "seed": "node seed-db.js",
-    "tasks": "node tasks/index.js"
+    "test": "nyc --reporter=text mocha --require babel-core/register --timeout 5000",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage:report": "nyc --reporter=html mocha --require babel-core/register --timeout 5000"
   },
   "keywords": [
     "koa2-api-boilerplate",
@@ -35,6 +33,7 @@
   },
   "dependencies": {
     "apidoc": "^0.16.1",
+    "babel-core": "^6.26.3",
     "bcrypt": "^0.8.5",
     "glob": "^7.0.0",
     "googleapis": "^33.0.0",
@@ -60,13 +59,19 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "eslint": "^3.4.0",
-    "eslint-config-standard": "^6.0.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.5.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-promise": "^2.0.1",
-    "eslint-plugin-standard": "^2.0.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "node-mocks-http": "^1.7.0",
+    "nodemon": "^1.8.1",
+    "nyc": "^11.6.0",
     "kubernetes-client": "^6.1.0",
     "mocha": "^3.5.3",
-    "nodemon": "^1.8.1",
-    "supertest": "^2.0.0"
+    "supertest": "^2.0.0",
+    "prettier": "^1.14.2"
   }
 }

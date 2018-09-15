@@ -16,10 +16,10 @@ Install the deps
 
 Start the app
 
-* `yarn start` Start server on live mode
-* `yarn run dev` Start server on dev mode with nodemon
-* `yarn run docs` Generate API documentation
-* `yarn test` Run mocha tests
+- `yarn start` Start server on live mode
+- `yarn run dev` Start server on dev mode with nodemon
+- `yarn run docs` Generate API documentation
+- `yarn test` Run mocha tests
 
 ## Documentation
 
@@ -32,3 +32,5 @@ Visit `http://localhost:5000/docs/` to view docs
 MIT
 
 Forked from https://github.com/christroutner/babel-free-koa2-api-boilerplate
+
+[![Coverage Status](https://coveralls.io/repos/github/Bitcoin-com/cloudrest.bitcoin.com/badge.svg?branch=master)](https://coveralls.io/github/Bitcoin-com/cloudrest.bitcoin.com?branch=master)
