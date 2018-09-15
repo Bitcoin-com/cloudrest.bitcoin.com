@@ -1,5 +1,5 @@
-"use strict";
-const User = require("../../models/users");
+'use strict'
+const User = require('../../models/users')
 
 /**
  * @api {post} /users Create a new user
@@ -41,23 +41,23 @@ const User = require("../../models/users");
  */
 
 const createUser = async ctx => {
-  const user = new User(ctx.request.body.user);
+  const user = new User(ctx.request.body.user)
   try {
-    await user.save();
+    await user.save()
   } catch (err) {
-    ctx.throw(422, err.message);
+    ctx.throw(422, err.message)
   }
 
-  const token = user.generateToken();
-  const response = user.toJSON();
+  const token = user.generateToken()
+  const response = user.toJSON()
 
-  delete response.password;
+  delete response.password
 
   ctx.body = {
     user: response,
-    token
-  };
-};
+    token,
+  }
+}
 
 /**
  * @api {get} /users Get all users
@@ -87,9 +87,9 @@ const createUser = async ctx => {
  * @apiUse TokenError
  */
 const getUsers = async ctx => {
-  const users = await User.find({}, "-password");
-  ctx.body = { users };
-};
+  const users = await User.find({}, '-password')
+  ctx.body = { users }
+}
 
 /**
  * @api {get} /users/:id Get user by id
@@ -120,20 +120,20 @@ const getUsers = async ctx => {
  */
 const getUser = async (ctx, next) => {
   try {
-    const user = await User.findById(ctx.params.id, "-password");
-    if (!user) ctx.throw(404);
+    const user = await User.findById(ctx.params.id, '-password')
+    if (!user) ctx.throw(404)
 
     ctx.body = {
-      user
-    };
+      user,
+    }
   } catch (err) {
-    if (err === 404 || err.name === "CastError") ctx.throw(404);
+    if (err === 404 || err.name === 'CastError') ctx.throw(404)
 
-    ctx.throw(500);
+    ctx.throw(500)
   }
 
-  if (next) return next();
-};
+  if (next) return next()
+}
 
 /**
  * @api {put} /users/:id Update a user
@@ -176,16 +176,16 @@ const getUser = async (ctx, next) => {
  * @apiUse TokenError
  */
 const updateUser = async ctx => {
-  const user = ctx.body.user;
+  const user = ctx.body.user
 
-  Object.assign(user, ctx.request.body.user);
+  Object.assign(user, ctx.request.body.user)
 
-  await user.save();
+  await user.save()
 
   ctx.body = {
-    user
-  };
-};
+    user,
+  }
+}
 
 /**
  * @api {delete} /users/:id Delete a user
@@ -208,20 +208,20 @@ const updateUser = async ctx => {
  * @apiUse TokenError
  */
 const deleteUser = async ctx => {
-  const user = ctx.body.user;
+  const user = ctx.body.user
 
-  await user.remove();
+  await user.remove()
 
-  ctx.status = 200;
+  ctx.status = 200
   ctx.body = {
-    success: true
-  };
-};
+    success: true,
+  }
+}
 
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
-  deleteUser
-};
+  deleteUser,
+}
