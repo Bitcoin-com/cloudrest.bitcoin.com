@@ -1,4 +1,5 @@
-const User = require('../../models/users')
+"use strict"
+const User = require("../../models/users")
 
 /**
  * @api {post} /users Create a new user
@@ -38,8 +39,8 @@ const User = require('../../models/users')
  *       "error": "Unprocessable Entity"
  *     }
  */
- 
-let createUser = async (ctx) => {
+
+const createUser = async ctx => {
   const user = new User(ctx.request.body.user)
   try {
     await user.save()
@@ -85,8 +86,8 @@ let createUser = async (ctx) => {
  *
  * @apiUse TokenError
  */
-let getUsers = async (ctx) => {
-  const users = await User.find({}, '-password')
+const getUsers = async ctx => {
+  const users = await User.find({}, "-password")
   ctx.body = { users }
 }
 
@@ -117,25 +118,21 @@ let getUsers = async (ctx) => {
  *
  * @apiUse TokenError
  */
-let getUser = async (ctx, next) => {
+const getUser = async (ctx, next) => {
   try {
-    const user = await User.findById(ctx.params.id, '-password')
-    if (!user) {
-      ctx.throw(404)
-    }
+    const user = await User.findById(ctx.params.id, "-password")
+    if (!user) ctx.throw(404)
 
     ctx.body = {
       user
     }
   } catch (err) {
-    if (err === 404 || err.name === 'CastError') {
-      ctx.throw(404)
-    }
+    if (err === 404 || err.name === "CastError") ctx.throw(404)
 
     ctx.throw(500)
   }
 
-  if (next) { return next() }
+  if (next) return next()
 }
 
 /**
@@ -178,7 +175,7 @@ let getUser = async (ctx, next) => {
  *
  * @apiUse TokenError
  */
-let updateUser = async (ctx) => {
+const updateUser = async ctx => {
   const user = ctx.body.user
 
   Object.assign(user, ctx.request.body.user)
@@ -210,8 +207,7 @@ let updateUser = async (ctx) => {
  *
  * @apiUse TokenError
  */
-
-let deleteUser = async (ctx) => {
+const deleteUser = async ctx => {
   const user = ctx.body.user
 
   await user.remove()

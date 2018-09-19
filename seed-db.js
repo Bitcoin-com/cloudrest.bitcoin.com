@@ -1,88 +1,90 @@
-const config = require('./config')
-const seeder = require('mongoose-seed')
+"use strict"
+const config = require("./config")
+const seeder = require("mongoose-seed")
 
 // Data array containing seed data - documents organized by Model
-let data = [
+const data = [
   {
-    'model': 'Appsettings',
-    'documents': [
+    model: "Appsettings",
+    documents: [
       {
-        env: 'development',
+        env: "development",
         node_defaults: {
-          flavor: 'bu',
-          tier: 'standard',
+          flavor: "bu",
+          tier: "standard",
           private: true,
-          services: ['rest'],
+          services: ["rest"],
           pruned: false,
           clone_blockchain: true,
-          disk_size_gb_full: '220',
-          disk_size_gb_pruned: '20',
+          disk_size_gb_full: "220",
+          disk_size_gb_pruned: "20"
         },
         node_flavors: [
           {
-            name: 'abc',
-            image: 'zquestz/bitcoin-abc',
+            name: "abc",
+            image: "zquestz/bitcoin-abc"
           },
           {
-            name: 'bu',
-            image: 'zquestz/bitcoin-unlimited',
+            name: "bu",
+            image: "zquestz/bitcoin-unlimited"
           },
           {
-            name: 'xt',
-            image: 'zquestz/bitcoin-xt',
+            name: "xt",
+            image: "zquestz/bitcoin-xt"
           },
           {
-            name: 'wormhole',
-            image: '',
+            name: "wormhole",
+            image: "",
             defaults: {
-              services: ['rest', 'wormhole-rest']
+              services: ["rest", "wormhole-rest"]
             }
           },
           {
-            name: 'no-node',
-            image: '',
-          },
+            name: "no-node",
+            image: ""
+          }
         ],
-        source_blockchain_snapshot: 'bch-data-2018-09-13t01-10-19-154z',
-        source_blockchain_deploy: 'source-blockchain-deploy',
-        source_blockchain_disk: 'source-blockchain-disk',
+        source_blockchain_snapshot: "bch-data-2018-09-13t01-10-19-154z",
+        source_blockchain_deploy: "source-blockchain-deploy",
+        source_blockchain_disk: "source-blockchain-disk",
         services: [
           {
-            name: 'rest',
-            image: '',
-          },
+            name: "rest",
+            image: ""
+          }
         ],
-        usd_per_minute: '0.001',
+        usd_per_minute: "0.001",
         minimum_billing_days: 7,
         notify_user_node_expiration_days: 30,
         quote_valid_minutes: 10,
         invoice_confirmations_required: 0,
         gcloud: {
-          project: 'bitbox-cloud-stage',
-          zone: 'us-central1-a',
-        },
-      },
+          project: "bitbox-cloud-stage",
+          zone: "us-central1-a"
+        }
+      }
     ]
-  },
+  }
 ]
 
 // Connect to MongoDB via Mongoose
-seeder.connect(config.database, function() {
+seeder.connect(
+  config.database,
+  function() {
+    // Load Mongoose models
+    seeder.loadModels([
+      "src/models/appsettings.js",
+      "src/models/invoices.js",
+      "src/models/nodes.js",
+      "src/models/users.js"
+    ])
 
-  // Load Mongoose models
-  seeder.loadModels([
-    'src/models/appsettings.js',
-    'src/models/invoices.js',
-    'src/models/nodes.js',
-    'src/models/users.js',
-  ])
- 
-  // Clear specified collections
-  seeder.clearModels(['Appsettings', 'Invoice', 'Node', 'User'], function() {
-
-    // Callback to populate DB once collections have been cleared
-    seeder.populateModels(data, function() {
-      seeder.disconnect()
+    // Clear specified collections
+    seeder.clearModels(["Appsettings", "Invoice", "Node", "User"], function() {
+      // Callback to populate DB once collections have been cleared
+      seeder.populateModels(data, function() {
+        seeder.disconnect()
+      })
     })
-  })
-})
+  }
+)

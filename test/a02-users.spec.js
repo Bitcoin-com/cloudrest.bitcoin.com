@@ -1,78 +1,84 @@
-const expect = require('chai').expect
-const should = require('chai').should
-const utils = require('./utils')
+"use strict"
+const expect = require("chai").expect
+const should = require("chai").should
+const utils = require("./utils")
 
-const rp = require('request-promise')
-const assert = require('chai').assert
+const rp = require("request-promise")
+const assert = require("chai").assert
 
-const LOCALHOST = 'http://localhost:5000'
+const LOCALHOST = "http://localhost:5000"
 
 should()
 const context = {}
 
-describe('#Users', () => {
+describe("#Users", () => {
   before(async () => {
     utils.cleanDb()
   })
 
-  describe('POST /users', () => {
-    it('should reject signup when data is incomplete', async () => {
+  describe("POST /users", () => {
+    it("should reject signup when data is incomplete", async () => {
       try {
         const options = {
-          method: 'POST',
+          method: "POST",
           uri: `${LOCALHOST}/users`,
           resolveWithFullResponse: true,
           json: true,
           body: {
-            username: 'supercoolname'
+            username: "supercoolname"
           }
         }
 
-        let result = await rp(options)
+        const result = await rp(options)
 
         console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
-        assert(false, 'Unexpected result')
+        assert(false, "Unexpected result")
       } catch (err) {
         if (err.statusCode === 422) {
-          assert(err.statusCode === 422, 'Error code 422 expected.')
+          assert(err.statusCode === 422, "Error code 422 expected.")
         } else if (err.statusCode === 401) {
-          assert(err.statusCode === 401, 'Error code 401 expected.')
+          assert(err.statusCode === 401, "Error code 401 expected.")
         } else {
-          console.error('Error: ', err)
-          console.log('Error stringified: ' + JSON.stringify(err, null, 2))
+          console.error("Error: ", err)
+          console.log(`Error stringified: ${JSON.stringify(err, null, 2)}`)
           throw err
         }
       }
     })
 
-    it('should sign up', async () => {
+    it("should sign up", async () => {
       try {
         const options = {
-          method: 'POST',
+          method: "POST",
           uri: `${LOCALHOST}/users`,
           resolveWithFullResponse: true,
           json: true,
           body: {
-            user: { username: 'supercoolname', password: 'supersecretpassword' }
+            user: {
+              username: "supercoolname",
+              email: "supercool@example.com",
+              password: "supersecretpassword"
+            }
           }
         }
 
-        let result = await rp(options)
+        const result = await rp(options)
 
-        result.body.user.should.have.property('username')
-        result.body.user.username.should.equal('supercoolname')
+        result.body.user.should.have.property("username")
+        result.body.user.username.should.equal("supercoolname")
         expect(result.body.user.password).to.not.exist
 
         context.user = result.body.user
         context.token = result.body.token
-
       } catch (err) {
-        console.log('Error authenticating test user: ' + JSON.stringify(err, null, 2))
+        console.log(
+          `Error authenticating test user: ${JSON.stringify(err, null, 2)}`
+        )
         throw err
       }
     })
   })
-/*
+  /*
   describe('GET /users', () => {
     it('should not fetch users if the authorization header is missing', (done) => {
       request

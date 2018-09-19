@@ -61,3 +61,6 @@ docs
 .vscode
 
 .nyc_output
+
+# system files
+**/.DS_Store
