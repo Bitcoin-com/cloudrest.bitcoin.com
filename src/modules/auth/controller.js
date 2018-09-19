@@ -1,5 +1,5 @@
-'use strict'
-const passport = require('koa-passport')
+"use strict"
+const passport = require("koa-passport")
 
 /**
  * @apiDefine TokenError
@@ -52,7 +52,7 @@ const passport = require('koa-passport')
  */
 
 const authUser = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     if (!user) ctx.throw(401)
 
     const token = user.generateToken()
@@ -63,67 +63,67 @@ const authUser = async (ctx, next) =>
 
     ctx.body = {
       token,
-      user: response,
+      user: response
     }
   })(ctx, next)
 
 const login = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200
     ctx.body = {
-      success: 'login',
+      success: "login"
     }
   })(ctx, next)
 
 const logout = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200
     ctx.body = {
-      success: 'logout',
+      success: "logout"
     }
   })(ctx, next)
 
 const twofa = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200
     ctx.body = {
-      success: 'twofa',
+      success: "twofa"
     }
   })(ctx, next)
 
 const token = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200
     ctx.body = {
-      success: 'token',
+      success: "token"
     }
   })(ctx, next)
 
 const whoami = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     // if (!user) {
     //   ctx.throw(401)
     // }
 
     ctx.status = 200
     ctx.body = {
-      success: 'whoami',
+      success: "whoami"
     }
   })(ctx, next)
 
@@ -133,5 +133,5 @@ module.exports = {
   logout,
   twofa,
   token,
-  whoami,
+  whoami
 }

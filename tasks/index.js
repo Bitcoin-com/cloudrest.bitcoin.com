@@ -1,24 +1,24 @@
-'use strict'
-const KubeClient = require('kubernetes-client').Client
-const kubeconfig = require('kubernetes-client').config
+"use strict"
+const KubeClient = require("kubernetes-client").Client
+const kubeconfig = require("kubernetes-client").config
 const kubeClient = new KubeClient({
   config: kubeconfig.fromKubeconfig(),
-  version: '1.9',
+  version: "1.9"
 })
-const mongoose = require('mongoose')
-const config = require('../config')
-const Node = require('../src/models/nodes')
-const User = require('../src/models/users')
-const Invoice = require('../src/models/invoices')
-const Appsettings = require('../src/models/appsettings')
-const utils = require('./utils')
-const gcloudDisks = require('./gcloud-disks')
-const moment = require('moment')
+const mongoose = require("mongoose")
+const config = require("../config")
+const Node = require("../src/models/nodes")
+const User = require("../src/models/users")
+const Invoice = require("../src/models/invoices")
+const Appsettings = require("../src/models/appsettings")
+const utils = require("./utils")
+const gcloudDisks = require("./gcloud-disks")
+const moment = require("moment")
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function main() {
   mongoose.Promise = global.Promise
-  mongoose.set('useCreateIndex', true)
+  mongoose.set("useCreateIndex", true)
   await mongoose.connect(
     config.database,
     { useNewUrlParser: true }
@@ -39,8 +39,8 @@ async function processInvoices() {
 }
 
 async function processNodes() {
-  const nodes = await Node.find({ status: { $regex: 'pending:.*' } }).populate(
-    '_user'
+  const nodes = await Node.find({ status: { $regex: "pending:.*" } }).populate(
+    "_user"
   )
   for (const node of nodes) {
     // Determine global node name
@@ -52,7 +52,7 @@ async function processNodes() {
     const zone = appsettings.gcloud.zone
 
     switch (node.status) {
-      case 'pending:new':
+      case "pending:new":
         // New disk configuration
         const newDiskName = `bc-${globalNodeName}`
         const pruned = appsettings.node_defaults.pruned
@@ -72,11 +72,11 @@ async function processNodes() {
 
         // Update node's status & data disk name
         node.data_disk_name = newDiskName
-        node.status = 'pending:cloning'
+        node.status = "pending:cloning"
         await node.save()
 
         break
-      case 'pending:cloning':
+      case "pending:cloning":
         // Wait for cloning to complete
         const isDiskReady = await gcloudDisks.isDiskReady(
           project,
@@ -86,7 +86,7 @@ async function processNodes() {
         if (!isDiskReady) break
 
         // Determine node image
-        const flavor = node.flavor.split('.', 1)[0]
+        const flavor = node.flavor.split(".", 1)[0]
         const image = appsettings.node_flavors.find(
           item => item.name === flavor
         ).image
@@ -96,7 +96,7 @@ async function processNodes() {
         const fromTokens = [
           /#\{NODE_NAME\}#/g,
           /#\{DATA_DISK_NAME\}#/g,
-          /#\{NODE_IMAGE\}#/g,
+          /#\{NODE_IMAGE\}#/g
         ]
         const toValues = [globalNodeName, node.data_disk_name, node.image]
         const deploymentManifest = await utils.getKubeConfig(
@@ -107,33 +107,33 @@ async function processNodes() {
 
         // Deploy node
         const createRes = await kubeClient.apis.apps.v1
-          .namespaces('default')
+          .namespaces("default")
           .deployments.post({ body: deploymentManifest })
 
         // Update node status
-        node.status = 'pending:deploying'
+        node.status = "pending:deploying"
         await node.save()
 
         break
-      case 'pending:deploying':
+      case "pending:deploying":
         // Verify rollout complete to continue
         const deployStatusRes = await kubeClient.apis.apps.v1
-          .namespaces('default')
+          .namespaces("default")
           .deployments(`${globalNodeName}-deploy`)
           .get()
         if (deployStatusRes.body.status.readyReplicas !== 1) break
 
         // Update status
-        node.status = 'live'
+        node.status = "live"
         await node.save()
 
         break
-      case 'pending:backup':
+      case "pending:backup":
         // Backup data disk
         const snapshotName = `${globalNodeName}-${now
           .toISOString()
           .toLowerCase()
-          .replace(/\:|\./g, '-')}`
+          .replace(/\:|\./g, "-")}`
         await gcloudDisks.createSnapshotFromDisk(
           project,
           zone,
@@ -143,16 +143,16 @@ async function processNodes() {
 
         // Delete deployment & pods
         await kubeClient.apis.apps.v1
-          .namespaces('default')
+          .namespaces("default")
           .deployments(`${globalNodeName}-deploy`)
           .delete()
 
         // Update status
-        node.status = 'pending:deleteDisk'
+        node.status = "pending:deleteDisk"
         await node.save()
 
         break
-      case 'pending:deleteDisk':
+      case "pending:deleteDisk":
         // Verify disk is detached to continue
         const isDiskAttached = await gcloudDisks.isDiskAttached(
           project,
@@ -167,7 +167,7 @@ async function processNodes() {
         // TODO: Delete backups
 
         // Update status
-        node.status = 'deleted'
+        node.status = "deleted"
         await node.save()
 
         break
@@ -189,13 +189,13 @@ async function updateBlockchainSnapshot() {
     appsettings.source_blockchain_snapshot
   )
   const createdAt = moment(snapshotRes.data.creationTimestamp)
-  const expiresAt = createdAt.add(24, 'hours')
+  const expiresAt = createdAt.add(24, "hours")
   const now = moment()
   if (now.isBefore(expiresAt)) return
 
   // Scale down source deployment
   const scaleDownRes = await kubeClient.apis.apps.v1
-    .namespaces('default')
+    .namespaces("default")
     .deployments(sourceDeploy)
     .scale.patch({ body: { spec: { replicas: 0 } } })
 
@@ -215,7 +215,7 @@ async function updateBlockchainSnapshot() {
   const snapshotName = `bch-data-${now
     .toISOString()
     .toLowerCase()
-    .replace(/\:|\./g, '-')}`
+    .replace(/\:|\./g, "-")}`
   await gcloudDisks.createSnapshotFromDisk(
     project,
     zone,
@@ -235,7 +235,7 @@ async function updateBlockchainSnapshot() {
 
   // Resume source deploy
   const scaleUpRes = await kubeClient.apis.apps.v1
-    .namespaces('default')
+    .namespaces("default")
     .deployments(sourceDeploy)
     .scale.patch({ body: { spec: { replicas: 1 } } })
 

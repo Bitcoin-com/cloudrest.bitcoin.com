@@ -1,9 +1,9 @@
-'use strict'
-const glob = require('glob')
-const Router = require('koa-router')
+"use strict"
+const glob = require("glob")
+const Router = require("koa-router")
 
 module.exports = function initModules(app) {
-  glob(`${__dirname}/*`, { ignore: '**/index.js' }, (err, matches) => {
+  glob(`${__dirname}/*`, { ignore: "**/index.js" }, (err, matches) => {
     if (err) throw err
 
     // Loop through each sub-directory in the modules directory.
@@ -25,8 +25,8 @@ module.exports = function initModules(app) {
         //  route = '',
         //  handlers = []
         // } = config
-        const method = config.method || ''
-        const route = config.route || ''
+        const method = config.method || ""
+        const route = config.route || ""
         const handlers = config.handlers || []
 
         const lastHandler = handlers.pop()

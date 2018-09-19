@@ -1,8 +1,8 @@
-'use strict'
-const User = require('../models/users')
-const config = require('../../config')
-const getToken = require('../utils/auth')
-const jwt = require('jsonwebtoken')
+"use strict"
+const User = require("../models/users")
+const config = require("../../config")
+const getToken = require("../utils/auth")
+const jwt = require("jsonwebtoken")
 
 module.exports = async function ensureUser(ctx, next) {
   // console.log(`getToken: ${typeof (getToken)}`)
@@ -23,7 +23,7 @@ module.exports = async function ensureUser(ctx, next) {
     ctx.throw(401)
   }
 
-  ctx.state.user = await User.findById(decoded.id, '-password')
+  ctx.state.user = await User.findById(decoded.id, "-password")
   if (!ctx.state.user) {
     // console.log(`Err: Could not find user.`)
     ctx.throw(401)
