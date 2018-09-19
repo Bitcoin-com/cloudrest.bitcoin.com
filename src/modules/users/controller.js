@@ -1,5 +1,5 @@
-'use strict'
-const User = require('../../models/users')
+"use strict"
+const User = require("../../models/users")
 
 /**
  * @api {post} /users Create a new user
@@ -55,7 +55,7 @@ const createUser = async ctx => {
 
   ctx.body = {
     user: response,
-    token,
+    token
   }
 }
 
@@ -87,7 +87,7 @@ const createUser = async ctx => {
  * @apiUse TokenError
  */
 const getUsers = async ctx => {
-  const users = await User.find({}, '-password')
+  const users = await User.find({}, "-password")
   ctx.body = { users }
 }
 
@@ -120,14 +120,14 @@ const getUsers = async ctx => {
  */
 const getUser = async (ctx, next) => {
   try {
-    const user = await User.findById(ctx.params.id, '-password')
+    const user = await User.findById(ctx.params.id, "-password")
     if (!user) ctx.throw(404)
 
     ctx.body = {
-      user,
+      user
     }
   } catch (err) {
-    if (err === 404 || err.name === 'CastError') ctx.throw(404)
+    if (err === 404 || err.name === "CastError") ctx.throw(404)
 
     ctx.throw(500)
   }
@@ -183,7 +183,7 @@ const updateUser = async ctx => {
   await user.save()
 
   ctx.body = {
-    user,
+    user
   }
 }
 
@@ -214,7 +214,7 @@ const deleteUser = async ctx => {
 
   ctx.status = 200
   ctx.body = {
-    success: true,
+    success: true
   }
 }
 
@@ -223,5 +223,5 @@ module.exports = {
   getUsers,
   getUser,
   updateUser,
-  deleteUser,
+  deleteUser
 }

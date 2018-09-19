@@ -1,9 +1,9 @@
-"use strict";
-const config = require("./config");
-const seeder = require("mongoose-seed");
+"use strict"
+const config = require("./config")
+const seeder = require("mongoose-seed")
 
 // Data array containing seed data - documents organized by Model
-let data = [
+const data = [
   {
     model: "Appsettings",
     documents: [
@@ -65,7 +65,7 @@ let data = [
       }
     ]
   }
-];
+]
 
 // Connect to MongoDB via Mongoose
 seeder.connect(
@@ -77,14 +77,14 @@ seeder.connect(
       "src/models/invoices.js",
       "src/models/nodes.js",
       "src/models/users.js"
-    ]);
+    ])
 
     // Clear specified collections
     seeder.clearModels(["Appsettings", "Invoice", "Node", "User"], function() {
       // Callback to populate DB once collections have been cleared
       seeder.populateModels(data, function() {
-        seeder.disconnect();
-      });
-    });
+        seeder.disconnect()
+      })
+    })
   }
-);
+)

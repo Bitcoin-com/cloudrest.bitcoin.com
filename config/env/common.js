@@ -1,8 +1,8 @@
 // export default {
 //  port: process.env.PORT || 5000
 // }
-"use strict";
+"use strict"
 
 module.exports = {
   port: process.env.PORT || 5000
-};
+}

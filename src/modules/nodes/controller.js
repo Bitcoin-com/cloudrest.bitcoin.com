@@ -1,10 +1,10 @@
-'use strict'
-const passport = require('koa-passport')
-const Node = require('../../models/nodes')
-const Invoice = require('../../models/invoices')
-const Appsettings = require('../../models/appsettings')
-const getBchRate = require('../../services/price')
-const getNewPaymentAddress = require('../../services/payment-address')
+"use strict"
+const passport = require("koa-passport")
+const Node = require("../../models/nodes")
+const Invoice = require("../../models/invoices")
+const Appsettings = require("../../models/appsettings")
+const getBchRate = require("../../services/price")
+const getNewPaymentAddress = require("../../services/payment-address")
 
 /**
  * @api {post} /nodes Create a new node
@@ -53,19 +53,19 @@ const getNewPaymentAddress = require('../../services/payment-address')
  *     }
  */
 const createNode = async (ctx, next) =>
-  passport.authenticate('local', async user => {
+  passport.authenticate("local", async user => {
     try {
       const appsettings = await Appsettings.getAppsettingsForEnv()
       const nodeDefaults = appsettings.node_defaults.toJSON()
       const userInput = {
         flavor: ctx.request.body.flavor,
-        name: ctx.request.body.name,
+        name: ctx.request.body.name
       }
       const nodeSettings = Object.assign({}, nodeDefaults, userInput)
 
       const node = new Node({
         _user: ctx.state.user._id,
-        ...nodeSettings,
+        ...nodeSettings
       })
 
       await node.save()
@@ -84,7 +84,7 @@ const createNode = async (ctx, next) =>
         _node: node._id,
         bch_address: paymentAddress,
         bch_per_minute: priceQuote,
-        expires_at: expiresAt,
+        expires_at: expiresAt
       })
       await invoice.save()
       node.invoices.push(invoice)
@@ -94,9 +94,9 @@ const createNode = async (ctx, next) =>
       ctx.body = {
         node: {
           name: node.name,
-          flavor: node.flavor,
+          flavor: node.flavor
         },
-        invoice: invoice.toJSON(),
+        invoice: invoice.toJSON()
       }
     } catch (err) {
       ctx.throw(422, err.message)
@@ -134,7 +134,7 @@ const createNode = async (ctx, next) =>
  */
 const getNodes = async (ctx, next) =>
   // TODO: Get all nodes
-  passport.authenticate('local', async user => {
+  passport.authenticate("local", async user => {
     const nodes = await Node.find({ _user: ctx.state.user._id })
 
     ctx.status = 200
@@ -171,7 +171,7 @@ const getNodes = async (ctx, next) =>
  * @apiUse TokenError
  */
 const getNode = async (ctx, next) =>
-  passport.authenticate('local', async user => {
+  passport.authenticate("local", async user => {
     const nodes = await Node.find({ _user: ctx.state.user._id })
 
     ctx.status = 200
@@ -230,15 +230,15 @@ const updateNode = async ctx => {
   await user.save()
 
   ctx.body = {
-    user,
+    user
   }
 }
 
 const deleteNode = async (ctx, next) =>
-  passport.authenticate('local', user => {
+  passport.authenticate("local", user => {
     ctx.status = 200
     ctx.body = {
-      success: `delete ${ctx.params.name}`,
+      success: `delete ${ctx.params.name}`
     }
   })(ctx, next)
 
@@ -247,5 +247,5 @@ module.exports = {
   getNodes,
   getNode,
   updateNode,
-  deleteNode,
+  deleteNode
 }
