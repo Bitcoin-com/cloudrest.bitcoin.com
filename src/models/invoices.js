@@ -1,3 +1,4 @@
+'use strict'
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -9,15 +10,15 @@ const Invoice = new mongoose.Schema({
   paid: { type: Boolean, required: true, default: false },
   amount_paid: { type: String },
   expires_at: { type: Date, required: true },
-  created_at: { type: Date, default: Date.now }
+  created_at: { type: Date, default: Date.now },
 })
 
-Invoice.methods.toJSON = function () {
-  let invoice = {
+Invoice.methods.toJSON = function() {
+  const invoice = {
     bch_address: this.bch_address,
     bch_per_minute: this.bch_per_minute,
     paid: this.paid,
-    expires_at: this.expires_at
+    expires_at: this.expires_at,
   }
 
   return invoice

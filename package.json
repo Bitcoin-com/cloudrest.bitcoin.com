@@ -6,10 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "./node_modules/.bin/nodemon index.js",
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha",
-    "test:next": "nyc --reporter=text mocha --require babel-core/register --timeout 5000",
+    "test": "nyc --reporter=text mocha --timeout 5000",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "nyc --reporter=html mocha --require babel-core/register --timeout 5000",
+    "coverage:report": "nyc --reporter=html mocha --timeout 5000",
     "lint": "eslint src/**/*.js",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "seed": "node seed-db.js",
@@ -71,12 +70,12 @@
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-promise": "^2.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "kubernetes-client": "^6.1.0",
+    "mocha": "^3.5.3",
     "node-mocks-http": "^1.7.0",
     "nodemon": "^1.8.1",
     "nyc": "^11.6.0",
-    "kubernetes-client": "^6.1.0",
-    "mocha": "^3.5.3",
-    "supertest": "^2.0.0",
-    "prettier": "^1.14.2"
+    "prettier": "^1.14.2",
+    "supertest": "^2.0.0"
   }
 }
