@@ -26,7 +26,7 @@ async function main() {
 
   await processInvoices()
   await processNodes()
-  await updateBlockchainSnapshot()
+  //await updateBlockchainSnapshot()
   mongoose.disconnect()
 }
 
@@ -53,10 +53,6 @@ async function processNodes() {
 
     switch (node.status) {
       case 'pending:new':
-        // Update node status
-        node.status = 'pending:cloning'
-        await node.save()
-
         // New disk configuration
         const newDiskName = `bc-${globalNodeName}`
         const pruned = appsettings.node_defaults.pruned
@@ -74,8 +70,9 @@ async function processNodes() {
           sourceSnapshot
         )
 
-        // Update node's data disk name
+        // Update node's status & data disk name
         node.data_disk_name = newDiskName
+        node.status = 'pending:cloning'
         await node.save()
 
         break
@@ -89,18 +86,13 @@ async function processNodes() {
         if (!isDiskReady) break
 
         // Determine node image
-        const flavor = node.flavor.split('.', 1)
+        const flavor = node.flavor.split('.', 1)[0]
         const image = appsettings.node_flavors.find(
           item => item.name === flavor
         ).image
         node.image = image
 
-        // Update node status
-        node.status = 'pending:deploying'
-        await node.save()
-
         // Create deployment config files for node
-        const deploymentTemplate = 'kube-templates/bch-deployment.json'
         const fromTokens = [
           /#\{NODE_NAME\}#/g,
           /#\{DATA_DISK_NAME\}#/g,
@@ -108,15 +100,19 @@ async function processNodes() {
         ]
         const toValues = [globalNodeName, node.data_disk_name, node.image]
         const deploymentManifest = await utils.getKubeConfig(
-          deploymentTemplate,
           fromTokens,
-          toValues
+          toValues,
+          node.services
         )
 
         // Deploy node
         const createRes = await kubeClient.apis.apps.v1
           .namespaces('default')
           .deployments.post({ body: deploymentManifest })
+
+        // Update node status
+        node.status = 'pending:deploying'
+        await node.save()
 
         break
       case 'pending:deploying':
@@ -145,15 +141,15 @@ async function processNodes() {
           node.data_disk_name
         )
 
-        // Update status
-        node.status = 'pending:deleteDisk'
-        await node.save()
-
         // Delete deployment & pods
         await kubeClient.apis.apps.v1
           .namespaces('default')
           .deployments(`${globalNodeName}-deploy`)
           .delete()
+
+        // Update status
+        node.status = 'pending:deleteDisk'
+        await node.save()
 
         break
       case 'pending:deleteDisk':
@@ -168,7 +164,7 @@ async function processNodes() {
         // Delete disk
         await gcloudDisks.deleteDisk(project, zone, node.data_disk_name)
 
-        // Delete backups
+        // TODO: Delete backups
 
         // Update status
         node.status = 'deleted'
