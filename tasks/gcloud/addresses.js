@@ -42,8 +42,14 @@ class addresses {
   static async isReady(project, region, addressName) {
     const res = await this.get(project, region, addressName)
 
-    if (res.data.address && res.data.address) return true
+    if (res.data.address != null) return true
     return false
+  }
+
+  static async getIPAddress(project, region, addressName) {
+    const res = await this.get(project, region, addressName)
+
+    return res.data.address
   }
 }
 
