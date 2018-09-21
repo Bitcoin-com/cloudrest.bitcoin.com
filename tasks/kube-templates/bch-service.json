@@ -17,7 +17,7 @@
       }
     ],
     "type": "LoadBalancer",
-    "loadBalancerIP": "#{NODE_ADDRESS}#",
+    "loadBalancerIP": "#{NODE_IP_ADDRESS}#",
     "externalTrafficPolicy": "Local"
   }
 }
