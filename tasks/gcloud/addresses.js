@@ -3,10 +3,16 @@ const { google } = require("googleapis")
 const compute = google.compute("v1")
 
 class addresses {
-  static async create(project, region, resource) {
+  static async create(project, region, addressName) {
     const auth = await google.auth.getClient({
       scopes: ["https://www.googleapis.com/auth/compute"]
     })
+
+    const resource = {
+      name: addressName,
+      networkTier: "PREMIUM",
+      addressType: "EXTERNAL"
+    }
 
     const request = {
       project: project,
