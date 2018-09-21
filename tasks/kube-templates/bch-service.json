@@ -1,0 +1,23 @@
+{
+  "apiVersion": "v1",
+  "kind": "Service",
+  "metadata": {
+    "name": "#{NODE_NAME}#-svc",
+    "namespace": "default"
+  },
+  "spec": {
+    "selector": {
+      "app": "#{NODE_NAME}#-app"
+    },
+    "ports": [
+      {
+        "port": "8333",
+        "targetPort": "8333",
+        "name": "bitcoin"
+      }
+    ],
+    "type": "LoadBalancer",
+    "loadBalancerIP": "#{NODE_ADDRESS}#",
+    "externalTrafficPolicy": "Local"
+  }
+}
