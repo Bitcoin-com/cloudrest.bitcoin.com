@@ -66,8 +66,8 @@ const getServiceConfig = async (fromTokens, toValues, services) => {
     switch (service) {
       case "rest":
         const servicePortConfig = {
-          port: "80",
-          targetPort: "5000",
+          port: 80,
+          targetPort: 5000,
           name: "rest"
         }
         kubeConfig.spec.ports.push(servicePortConfig)

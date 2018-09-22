@@ -8,6 +8,7 @@ const kubeClient = new KubeClient({
 const Appsettings = require("../../src/models/appsettings")
 const utils = require("../utils")
 const gcloud = require("../gcloud")
+const moment = require("moment")
 
 async function processNode (node) {
   // Determine global node name
@@ -111,7 +112,7 @@ async function processNode (node) {
       )
 
       // Create node service
-      const createServiceRes = await kubeClient.apis.apps.v1
+      const createServiceRes = await kubeClient.apis.v1
         .namespaces("default")
         .services.post({ body: serviceManifest })
 
