@@ -38,6 +38,7 @@ const Appsettings = new mongoose.Schema({
   invoice_confirmations_required: { type: Number },
   gcloud: {
     project: { type: String },
+    region: { type: String },
     zone: { type: String }
   }
 })

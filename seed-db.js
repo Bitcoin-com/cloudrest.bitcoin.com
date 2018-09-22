@@ -60,6 +60,7 @@ const data = [
         invoice_confirmations_required: 0,
         gcloud: {
           project: "bitbox-cloud-stage",
+          region: "us-central1",
           zone: "us-central1-a"
         }
       }

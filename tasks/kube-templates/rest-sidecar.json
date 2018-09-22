@@ -39,11 +39,11 @@
       "value": "mainnet"
     }
   ],
-  "image": "gcr.io/bitbox-cloud-stage/rest",
+  "image": "spendbch/rest.bitcoin.com:1.6.0",
   "name": "rest",
   "ports": [
     {
-      "containerPort": 3000
+      "containerPort": 5000
     }
   ]
 }
