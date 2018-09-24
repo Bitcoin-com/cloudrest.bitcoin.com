@@ -11,9 +11,9 @@ const Node = require("../src/models/nodes")
 const User = require("../src/models/users")
 const Invoice = require("../src/models/invoices")
 const Appsettings = require("../src/models/appsettings")
-const utils = require("./utils")
-const gcloudDisks = require("./gcloud-disks")
+const gcloud = require("./gcloud")
 const moment = require("moment")
+const processNode = require("./node")
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function main() {
@@ -24,9 +24,19 @@ async function main() {
     { useNewUrlParser: true }
   )
 
-  await processInvoices()
-  await processNodes()
-  //await updateBlockchainSnapshot()
+  // TODO: Replace dev loop with app cron
+  while (true) {
+    try {
+      await processInvoices()
+      await processNodes()
+      //await updateBlockchainSnapshot()
+    } catch (err) {
+      console.log(err)
+    }
+
+    await sleep(1000)
+  }
+
   mongoose.disconnect()
 }
 
@@ -43,134 +53,11 @@ async function processNodes() {
     "_user"
   )
   for (const node of nodes) {
-    // Determine global node name
-    const globalNodeName = `${node._user.username}-${node.name}`.toLowerCase()
-
-    // Fetch current appsettings
-    const appsettings = await Appsettings.getAppsettingsForEnv()
-    const project = appsettings.gcloud.project
-    const zone = appsettings.gcloud.zone
-
-    switch (node.status) {
-      case "pending:new":
-        // New disk configuration
-        const newDiskName = `bc-${globalNodeName}`
-        const pruned = appsettings.node_defaults.pruned
-        const diskSizeGb = pruned
-          ? appsettings.node_defaults.disk_size_gb_pruned
-          : appsettings.node_defaults.disk_size_gb_full
-        const sourceSnapshot = appsettings.source_blockchain_snapshot
-
-        // Create disk
-        const createDiskRes = await gcloudDisks.createDiskFromSnapshot(
-          project,
-          zone,
-          newDiskName,
-          diskSizeGb,
-          sourceSnapshot
-        )
-
-        // Update node's status & data disk name
-        node.data_disk_name = newDiskName
-        node.status = "pending:cloning"
-        await node.save()
-
-        break
-      case "pending:cloning":
-        // Wait for cloning to complete
-        const isDiskReady = await gcloudDisks.isDiskReady(
-          project,
-          zone,
-          node.data_disk_name
-        )
-        if (!isDiskReady) break
-
-        // Determine node image
-        const flavor = node.flavor.split(".", 1)[0]
-        const image = appsettings.node_flavors.find(
-          item => item.name === flavor
-        ).image
-        node.image = image
-
-        // Create deployment config files for node
-        const fromTokens = [
-          /#\{NODE_NAME\}#/g,
-          /#\{DATA_DISK_NAME\}#/g,
-          /#\{NODE_IMAGE\}#/g
-        ]
-        const toValues = [globalNodeName, node.data_disk_name, node.image]
-        const deploymentManifest = await utils.getKubeConfig(
-          fromTokens,
-          toValues,
-          node.services
-        )
-
-        // Deploy node
-        const createRes = await kubeClient.apis.apps.v1
-          .namespaces("default")
-          .deployments.post({ body: deploymentManifest })
-
-        // Update node status
-        node.status = "pending:deploying"
-        await node.save()
-
-        break
-      case "pending:deploying":
-        // Verify rollout complete to continue
-        const deployStatusRes = await kubeClient.apis.apps.v1
-          .namespaces("default")
-          .deployments(`${globalNodeName}-deploy`)
-          .get()
-        if (deployStatusRes.body.status.readyReplicas !== 1) break
-
-        // Update status
-        node.status = "live"
-        await node.save()
-
-        break
-      case "pending:backup":
-        // Backup data disk
-        const snapshotName = `${globalNodeName}-${now
-          .toISOString()
-          .toLowerCase()
-          .replace(/\:|\./g, "-")}`
-        await gcloudDisks.createSnapshotFromDisk(
-          project,
-          zone,
-          snapshotName,
-          node.data_disk_name
-        )
-
-        // Delete deployment & pods
-        await kubeClient.apis.apps.v1
-          .namespaces("default")
-          .deployments(`${globalNodeName}-deploy`)
-          .delete()
-
-        // Update status
-        node.status = "pending:deleteDisk"
-        await node.save()
-
-        break
-      case "pending:deleteDisk":
-        // Verify disk is detached to continue
-        const isDiskAttached = await gcloudDisks.isDiskAttached(
-          project,
-          zone,
-          node.data_disk_name
-        )
-        if (isDiskAttached) break
-
-        // Delete disk
-        await gcloudDisks.deleteDisk(project, zone, node.data_disk_name)
-
-        // TODO: Delete backups
-
-        // Update status
-        node.status = "deleted"
-        await node.save()
-
-        break
+    try {
+      await processNode(node)
+    } catch (err) {
+      node.status = "error"
+      await node.save()
     }
   }
 }
@@ -212,7 +99,7 @@ async function updateBlockchainSnapshot() {
   }
 
   // Create snapshot
-  const snapshotName = `bch-data-${now
+  const snapshotName = `bch-data-${moment()
     .toISOString()
     .toLowerCase()
     .replace(/\:|\./g, "-")}`

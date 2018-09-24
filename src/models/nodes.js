@@ -8,6 +8,7 @@ const Node = new mongoose.Schema({
   name: { type: String, required: true },
   flavor: { type: String, required: true },
   ip_address: { type: String },
+  ip_address_name: { type: String },
   tier: { type: String },
   private: { type: Boolean, required: true },
   services: [{ type: Schema.Types.Mixed }],
