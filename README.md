@@ -27,7 +27,7 @@ Start the app
 - Set defaults in seed-db.js
 - `yarn run seed` Seed dev appsettings
 - Configure kubernetes and gcloud credentials
-- `yarn start tasks` Start tasks process
+- `yarn run tasks` Start tasks process
 - `yarn run dev` Start rest server
 
 ## Documentation
