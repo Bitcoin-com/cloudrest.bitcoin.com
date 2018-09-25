@@ -44,7 +44,7 @@ const data = [
             image: ""
           }
         ],
-        source_blockchain_snapshot: "bch-data-2018-09-13t01-10-19-154z",
+        source_blockchain_snapshot: "bch-data-2018-09-25t05-50-58-027z",
         source_blockchain_deploy: "source-blockchain-deploy",
         source_blockchain_disk: "source-blockchain-disk",
         services: [

@@ -29,7 +29,7 @@ async function main() {
     try {
       await processInvoices()
       await processNodes()
-      //await updateBlockchainSnapshot()
+      // await updateBlockchainSnapshot()
     } catch (err) {
       console.log(err)
     }
@@ -71,7 +71,7 @@ async function updateBlockchainSnapshot() {
   const sourceDiskName = appsettings.source_blockchain_disk
 
   // Verify snapshot is stale to continue
-  const snapshotRes = await gcloudDisks.getSnapshot(
+  const snapshotRes = await gcloud.snapshots.get(
     project,
     appsettings.source_blockchain_snapshot
   )
@@ -88,7 +88,7 @@ async function updateBlockchainSnapshot() {
 
   // Wait for deployment to scale down
   while (true) {
-    const isDiskAttached = await gcloudDisks.isDiskAttached(
+    const isDiskAttached = await gcloud.disks.isAttached(
       project,
       zone,
       sourceDiskName
@@ -103,7 +103,8 @@ async function updateBlockchainSnapshot() {
     .toISOString()
     .toLowerCase()
     .replace(/\:|\./g, "-")}`
-  await gcloudDisks.createSnapshotFromDisk(
+
+  const createSnapshotRes = await gcloud.snapshots.createFromDisk(
     project,
     zone,
     snapshotName,
@@ -112,7 +113,7 @@ async function updateBlockchainSnapshot() {
 
   // Wait for snapshot to complete
   while (true) {
-    const isSnapshotReady = await gcloudDisks.isSnapshotReady(
+    const isSnapshotReady = await gcloud.snapshots.isReady(
       project,
       snapshotName
     )
