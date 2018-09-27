@@ -1,0 +1,34 @@
+{
+  "apps": [
+      {
+        "name": "seed-db",
+        "script": "npm",
+        "args" : "run seed",
+        "autorestart": false,
+        "cwd": "/app/",
+        "env": {
+          "NODE_ENV": "development"
+        }
+      },
+      {
+        "name": "api",
+        "script": "/app/index.js",
+        "max_restarts": 20,
+        "env": {
+            "PORT": 5000,
+            "NODE_ENV": "development"
+        },
+        "restart_delay": 4000
+      },
+      {
+        "name": "tasks",
+        "script": "/app/tasks/index.js",
+        "max_restarts": 20,
+        "cwd": "/app/",
+        "env": {
+            "NODE_ENV": "development"
+        },
+        "restart_delay": 4000
+    }
+  ]
+}
