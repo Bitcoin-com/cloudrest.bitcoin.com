@@ -1,10 +1,17 @@
 "use strict"
 const KubeClient = require("kubernetes-client").Client
-const kubeconfig = require("kubernetes-client").config
+const kubeConfigOptions = require("kubernetes-client").config
+let kubeConfig
+try {
+  kubeConfig = kubeConfigOptions.getInCluster()
+} catch (err) {
+  kubeConfig = kubeConfigOptions.fromKubeconfig()
+}
 const kubeClient = new KubeClient({
-  config: kubeconfig.fromKubeconfig(),
+  config: kubeConfig,
   version: "1.9"
 })
+
 const mongoose = require("mongoose")
 const config = require("../config")
 const Node = require("../src/models/nodes")
@@ -56,6 +63,7 @@ async function processNodes() {
     try {
       await processNode(node)
     } catch (err) {
+      console.log(err)
       node.status = "error"
       await node.save()
     }

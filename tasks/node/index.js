@@ -1,10 +1,17 @@
 "use strict"
 const KubeClient = require("kubernetes-client").Client
-const kubeconfig = require("kubernetes-client").config
+const kubeConfigOptions = require("kubernetes-client").config
+let kubeConfig
+try {
+  kubeConfig = kubeConfigOptions.getInCluster()
+} catch (err) {
+  kubeConfig = kubeConfigOptions.fromKubeconfig()
+}
 const kubeClient = new KubeClient({
-  config: kubeconfig.fromKubeconfig(),
+  config: kubeConfig,
   version: "1.9"
 })
+
 const Appsettings = require("../../src/models/appsettings")
 const utils = require("../utils")
 const gcloud = require("../gcloud")
