@@ -65,14 +65,21 @@ const getServiceConfig = async (fromTokens, toValues, services) => {
   for (const service of services) {
     switch (service) {
       case "rest":
-        const servicePortConfig = {
+        const restPortConfig = {
           port: 80,
           targetPort: 5000,
           name: "rest"
         }
-        kubeConfig.spec.ports.push(servicePortConfig)
+        kubeConfig.spec.ports.push(restPortConfig)
 
         break
+      case "wormholerest":
+        const wormholerestPortConfig = {
+          port: 80,
+          targetPort: 5000,
+          name: "wormholerest"
+        }
+        kubeConfig.spec.ports.push(wormholerestPortConfig)
     }
   }
 

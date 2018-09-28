@@ -34,9 +34,9 @@ const data = [
           },
           {
             name: "wormhole",
-            image: "",
+            image: "spendbch/wormhole:0.1.0",
             defaults: {
-              services: ["rest", "wormhole-rest"]
+              services: ["wormholerest"]
             }
           },
           {
@@ -50,7 +50,11 @@ const data = [
         services: [
           {
             name: "rest",
-            image: ""
+            image: "spendbch/rest.bitcoin.com"
+          },
+          {
+            name: "wormholerest",
+            image: "spendbch/wormholerest"
           }
         ],
         usd_per_minute: "0.001",

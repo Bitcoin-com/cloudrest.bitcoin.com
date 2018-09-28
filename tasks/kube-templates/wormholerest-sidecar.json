@@ -1,0 +1,71 @@
+{
+  "env": [
+    {
+      "name": "BITCOINCOM_BASEURL",
+      "value": "http://your.ip.address/api/"
+    },
+    {
+      "name": "RPC_BASEURL",
+      "value": "http://127.0.0.1:8332/"
+    },
+    {
+      "name": "WORMHOLE_RPC_BASEURL",
+      "value": "http://127.0.0.1:8332/"
+    },
+    {
+      "name": "RPC_PASSWORD",
+      "valueFrom": {
+        "secretKeyRef": {
+          "name": "bitcoin-dev-secret",
+          "key": "rpcpass"
+        }
+      }
+    },
+    {
+      "name": "WORMHOLE_RPC_PASSWORD",
+      "valueFrom": {
+        "secretKeyRef": {
+          "name": "bitcoin-dev-secret",
+          "key": "rpcpass"
+        }
+      }
+    },
+    {
+      "name": "RPC_USERNAME",
+      "valueFrom": {
+        "secretKeyRef": {
+          "name": "bitcoin-dev-secret",
+          "key": "rpcuser"
+        }
+      }
+    },
+    {
+      "name": "WORMHOLE_RPC_USERNAME",
+      "valueFrom": {
+        "secretKeyRef": {
+          "name": "bitcoin-dev-secret",
+          "key": "rpcuser"
+        }
+      }
+    },
+    {
+      "name": "ZEROMQ_PORT",
+      "value": "28332"
+    },
+    {
+      "name": "ZEROMQ_URL",
+      "value": "127.0.0.1"
+    },
+    {
+      "name": "NETWORK",
+      "value": "mainnet"
+    }
+  ],
+  "image": "spendbch/wormholerest:latest",
+  "name": "rest",
+  "ports": [
+    {
+      "containerPort": 5000
+    }
+  ]
+}
