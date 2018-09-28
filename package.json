@@ -10,6 +10,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coverage:report": "nyc --reporter=html mocha --timeout 5000",
     "lint": "eslint src/**/*.js",
+    "deploy:latest": "./deployment/deploy-latest.sh",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "seed": "node seed-db.js",
     "tasks": "node tasks/index.js"

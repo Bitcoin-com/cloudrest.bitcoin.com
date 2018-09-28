@@ -7,4 +7,4 @@
 - create gcloud service account
   - grant create/read/delete permissions for disks, snapshots, and ip addresses
 - update with desired settings then apply all configs in deployment/init-kube
-- build and deploy latest cloudrest & tasks ```npm run deploy```
+- build and deploy latest cloudrest & tasks ```npm run deploy:latest```

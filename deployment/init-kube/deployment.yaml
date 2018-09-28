@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudrest-nginx-conf
+data:
+  default: |
+    upstream app {
+      server localhost:8080;
+      keepalive 1024;
+    }
+
+    server {
+      listen 443 ssl default_server;
+
+      server_name _;
+
+      include /config/nginx/ssl.conf;
+
+      location / {
+        proxy_pass http://app/;
+        proxy_http_version 1.1;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: cloudrest-deploy
+spec:
+  selector:
+    matchLabels:
+      app: cloudrest-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cloudrest-app
+    spec:
+      serviceAccountName: cloudrest-tasks-sa
+      automountServiceAccountToken: true
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: tasks-gcloud-key
+      - name: nginx-conf
+        configMap:
+          name: cloudrest-nginx-conf
+          items:
+          - key: default
+            path: default
+      - name: nginx-log
+        emptyDir: {}
+      containers:
+      - name: mongodb
+        image: mongo:4
+      - name: cloudrest
+        image: gcr.io/bitbox-cloud-stage/cloudrest:latest
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+      - name: nginx
+        image: linuxserver/letsencrypt
+        volumeMounts:
+        - mountPath: /config/nginx/site-confs
+          name: nginx-conf
+        - mountPath: /var/log/nginx
+          name: nginx-log
+        env:
+        - name: URL
+          value: bitbox.earth
+        - name: SUBDOMAINS
+          value: "crest"
+        - name: ONLY_SUBDOMAINS
+          value: "true"
+        - name: validation
+          value: http
+        ports:
+        - containerPort: 80
+        - containerPort: 443

@@ -12,8 +12,13 @@
     "ports": [
       {
         "port": 80,
-        "targetPort": 5000,
-        "name": "cloudrest"
+        "targetPort": 80,
+        "name": "http"
+      },
+      {
+        "port": 443,
+        "targetPort": 443,
+        "name": "https"
       }
     ],
     "type": "LoadBalancer",
