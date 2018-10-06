@@ -11,28 +11,22 @@ const getDeploymentConfig = async (fromTokens, toValues, services) => {
     "tasks",
     "kube-templates/bch-deployment.json"
   )
-  const tempPath = path.resolve(`tasks/temp/${uuidv4()}.json`)
-  const copyFile = util.promisify(fs.copyFile)
-  const copyResult = await copyFile(templatePath, tempPath)
-  const replaceOptions = {
-    files: tempPath,
-    from: fromTokens,
-    to: toValues
-  }
-  const fileChanges = await replace(replaceOptions)
-
-  // Load config without services
-  const kubeConfig = require(tempPath)
-
-  // Cleanup temp
-  const unlinkResult = await fs.unlink(tempPath)
+  const kubeConfig = await getFileConfig(
+    templatePath,
+    fromTokens,
+    toValues
+  )
 
   // Inject requested services
   for (const service of services) {
     const servicePath = path.resolve(
       `tasks/kube-templates/${service}-sidecar.json`
     )
-    const serviceConfig = require(servicePath)
+    const serviceConfig = await getFileConfig(
+      servicePath,
+      fromTokens,
+      toValues
+    )
     kubeConfig.spec.template.spec.containers.push(serviceConfig)
   }
 
@@ -84,6 +78,26 @@ const getServiceConfig = async (fromTokens, toValues, services) => {
   }
 
   return kubeConfig
+}
+
+const getFileConfig = async (sourceFile, fromTokens, toValues) => {
+  const tempPath = path.resolve(`tasks/temp/${uuidv4()}.json`)
+  const copyFile = util.promisify(fs.copyFile)
+  await copyFile(sourceFile, tempPath)
+  const replaceOptions = {
+    files: tempPath,
+    from: fromTokens,
+    to: toValues
+  }
+  await replace(replaceOptions)
+
+  // Load config without services
+  const config = require(tempPath)
+
+  // Cleanup temp
+  await fs.unlink(tempPath)
+
+  return config
 }
 
 module.exports = {

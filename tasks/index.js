@@ -31,7 +31,6 @@ async function main() {
     { useNewUrlParser: true }
   )
 
-  // TODO: Replace dev loop with app cron
   while (true) {
     try {
       await processInvoices()
