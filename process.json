@@ -1,16 +1,6 @@
 {
   "apps": [
       {
-        "name": "seed-db",
-        "script": "npm",
-        "args" : "run seed",
-        "autorestart": false,
-        "cwd": "/app/",
-        "env": {
-          "NODE_ENV": "development"
-        }
-      },
-      {
         "name": "api",
         "script": "/app/index.js",
         "max_restarts": 20,

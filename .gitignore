@@ -64,3 +64,6 @@ docs
 
 # system files
 **/.DS_Store
+
+# temp folder
+tasks/temp
