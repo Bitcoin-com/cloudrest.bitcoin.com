@@ -79,7 +79,9 @@ async function processNode (node) {
       const flavor = node.flavor.split(".", 1)[0]
       const image = appsettings.node_flavors.find(item => item.name === flavor)
         .image
-      node.image = image
+
+      // TODO: Set and save node image, uncomment below
+      // node.image = image
 
       // Create deployment config
       const deployTokens = [
@@ -87,11 +89,12 @@ async function processNode (node) {
         /#\{DATA_DISK_NAME\}#/g,
         /#\{NODE_IMAGE\}#/g
       ]
-      const deployValues = [globalNodeName, node.data_disk_name, node.image]
+      const deployValues = [globalNodeName, node.data_disk_name, image]
+      const nodeServiceNames = node.services.map(service => service.name)
       const deploymentManifest = await utils.getDeploymentConfig(
         deployTokens,
         deployValues,
-        node.services
+        nodeServiceNames
       )
 
       // Create node deployment
@@ -115,7 +118,7 @@ async function processNode (node) {
       const serviceManifest = await utils.getServiceConfig(
         serviceTokens,
         serviceValues,
-        node.services
+        nodeServiceNames
       )
 
       // Create node service
@@ -137,8 +140,20 @@ async function processNode (node) {
         .get()
       if (deployStatusRes.body.status.readyReplicas !== 1) break
 
+      // Set service urls
+      for (let i = 0; i < node.services.length; i++) {
+        const url = `https://cloud.spendbch.io/nodes/${globalNodeName}/${node.services[i].name}/`
+        node.services[i].url = url
+
+        // TODO: remove below line after displaying urls in services object in bitbox-cloud
+        node.url = `https://cloud.spendbch.io/nodes/${globalNodeName}/rest/`
+      }
+      node.markModified("services")
+
       // Update status
       node.status = "live"
+
+      // Save changes
       await node.save()
 
       break

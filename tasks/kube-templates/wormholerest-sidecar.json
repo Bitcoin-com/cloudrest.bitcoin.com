@@ -59,6 +59,10 @@
     {
       "name": "NETWORK",
       "value": "mainnet"
+    },
+    {
+      "name": "BASEURL",
+      "value": "/nodes/#{NODE_NAME}#/rest/v1"
     }
   ],
   "image": "spendbch/wormholerest:latest",
