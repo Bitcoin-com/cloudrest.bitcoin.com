@@ -22,11 +22,12 @@ data:
         proxy_http_version 1.1;
       }
 
-      location ~/nodes/([a-zA-Z0-9\-])/(.*) {
-        rewrite /nodes/(.*) /$1  break;
+      location ~/nodes/([a-zA-Z0-9\-]*)/(rest/)?(.*) {
         resolver kube-dns.kube-system.svc.cluster.local valid=5s;
-        proxy_pass "http://$1-svc.default.svc.cluster.local";
+        proxy_pass "http://$1-svc.default.svc.cluster.local/$3";
         proxy_set_header   Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_http_version 1.1;
       }
     }
@@ -41,6 +42,8 @@ spec:
     matchLabels:
       app: cloudrest-app
   replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -58,11 +61,24 @@ spec:
           items:
           - key: default
             path: default
-      - name: nginx-log
-        emptyDir: {}
+      - name: cloudrest-api-config
+        gcePersistentDisk:
+          pdName: cloudrest-api-config
+          fsType: ext4
+      - name: cloudrest-api-certs
+        gcePersistentDisk:
+          pdName: cloudrest-api-certs
+          fsType: ext4
+      - name: cloudrest-api-db
+        gcePersistentDisk:
+          pdName: cloudrest-api-db
+          fsType: ext4
       containers:
       - name: mongodb
         image: mongo:4
+        volumeMounts:
+        - name: cloudrest-api-db
+          mountPath: /data/db
       - name: cloudrest
         image: gcr.io/bitbox-cloud-stage/cloudrest:latest
         volumeMounts:
@@ -74,15 +90,17 @@ spec:
       - name: nginx
         image: linuxserver/letsencrypt
         volumeMounts:
+        - mountPath: /config
+          name: cloudrest-api-config
+        - mountPath: /le-ssl
+          name: cloudrest-api-certs
         - mountPath: /config/nginx/site-confs
           name: nginx-conf
-        - mountPath: /var/log/nginx
-          name: nginx-log
         env:
         - name: URL
-          value: bitbox.earth
+          value: spendbch.io
         - name: SUBDOMAINS
-          value: "crest"
+          value: "cloud"
         - name: ONLY_SUBDOMAINS
           value: "true"
         - name: validation
