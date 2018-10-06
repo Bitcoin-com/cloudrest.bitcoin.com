@@ -1,0 +1,24 @@
+{
+  "apps": [
+      {
+        "name": "api",
+        "script": "/app/index.js",
+        "max_restarts": 20,
+        "env": {
+            "PORT": 8080,
+            "NODE_ENV": "development"
+        },
+        "restart_delay": 4000
+      },
+      {
+        "name": "tasks",
+        "script": "/app/tasks/index.js",
+        "max_restarts": 20,
+        "cwd": "/app/",
+        "env": {
+            "NODE_ENV": "development"
+        },
+        "restart_delay": 4000
+    }
+  ]
+}

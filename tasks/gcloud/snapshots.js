@@ -36,9 +36,13 @@ class snapshots {
   }
 
   static async isReady(project, snapshotName) {
-    const res = await this.get(project, snapshotName)
+    try {
+      const res = await this.get(project, snapshotName)
 
-    return res.data.status === "READY"
+      return res.data.status === "READY"
+    } catch (err) {
+      return false
+    }
   }
 
   static async deleteSnapshot(project, snapshotName) {

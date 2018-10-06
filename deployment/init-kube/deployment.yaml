@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudrest-nginx-conf
+data:
+  default: |
+    upstream app {
+      server localhost:8080;
+      keepalive 1024;
+    }
+
+    server {
+      listen 443 ssl default_server;
+
+      server_name _;
+
+      include /config/nginx/ssl.conf;
+
+      location /api {
+        rewrite /api/(.*) /$1 break;
+        proxy_pass http://app/;
+        proxy_http_version 1.1;
+      }
+
+      location ~/nodes/([a-zA-Z0-9\-]*)/(rest/)?(.*) {
+        resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+        proxy_pass "http://$1-svc.default.svc.cluster.local/$3";
+        proxy_set_header   Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: cloudrest-deploy
+spec:
+  selector:
+    matchLabels:
+      app: cloudrest-app
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cloudrest-app
+    spec:
+      serviceAccountName: cloudrest-tasks-sa
+      automountServiceAccountToken: true
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: tasks-gcloud-key
+      - name: nginx-conf
+        configMap:
+          name: cloudrest-nginx-conf
+          items:
+          - key: default
+            path: default
+      - name: cloudrest-api-config
+        gcePersistentDisk:
+          pdName: cloudrest-api-config
+          fsType: ext4
+      - name: cloudrest-api-certs
+        gcePersistentDisk:
+          pdName: cloudrest-api-certs
+          fsType: ext4
+      - name: cloudrest-api-db
+        gcePersistentDisk:
+          pdName: cloudrest-api-db
+          fsType: ext4
+      containers:
+      - name: mongodb
+        image: mongo:4
+        volumeMounts:
+        - name: cloudrest-api-db
+          mountPath: /data/db
+      - name: cloudrest
+        image: gcr.io/bitbox-cloud-stage/cloudrest:latest
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+      - name: nginx
+        image: linuxserver/letsencrypt
+        volumeMounts:
+        - mountPath: /config
+          name: cloudrest-api-config
+        - mountPath: /le-ssl
+          name: cloudrest-api-certs
+        - mountPath: /config/nginx/site-confs
+          name: nginx-conf
+        env:
+        - name: URL
+          value: spendbch.io
+        - name: SUBDOMAINS
+          value: "cloud"
+        - name: ONLY_SUBDOMAINS
+          value: "true"
+        - name: validation
+          value: http
+        ports:
+        - containerPort: 80
+        - containerPort: 443

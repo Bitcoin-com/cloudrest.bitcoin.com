@@ -56,12 +56,20 @@ const createNode = async (ctx, next) =>
   passport.authenticate("local", async user => {
     try {
       const appsettings = await Appsettings.getAppsettingsForEnv()
-      const nodeDefaults = appsettings.node_defaults.toJSON()
       const userInput = {
         flavor: ctx.request.body.flavor,
         name: ctx.request.body.name
       }
-      const nodeSettings = Object.assign({}, nodeDefaults, userInput)
+
+      // Get general node defaults
+      const nodeDefaults = appsettings.node_defaults.toJSON()
+
+      // Get specific node flavor defaults
+      const flavor = userInput.flavor.split(".", 1)[0]
+      const flavorDefaults = appsettings.node_flavors.find(item => item.name === flavor)
+        .defaults
+
+      const nodeSettings = Object.assign({}, nodeDefaults, flavorDefaults, userInput)
 
       const node = new Node({
         _user: ctx.state.user._id,

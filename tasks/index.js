@@ -1,10 +1,17 @@
 "use strict"
 const KubeClient = require("kubernetes-client").Client
-const kubeconfig = require("kubernetes-client").config
+const kubeConfigOptions = require("kubernetes-client").config
+let kubeConfig
+try {
+  kubeConfig = kubeConfigOptions.getInCluster()
+} catch (err) {
+  kubeConfig = kubeConfigOptions.fromKubeconfig()
+}
 const kubeClient = new KubeClient({
-  config: kubeconfig.fromKubeconfig(),
+  config: kubeConfig,
   version: "1.9"
 })
+
 const mongoose = require("mongoose")
 const config = require("../config")
 const Node = require("../src/models/nodes")
@@ -24,12 +31,11 @@ async function main() {
     { useNewUrlParser: true }
   )
 
-  // TODO: Replace dev loop with app cron
   while (true) {
     try {
       await processInvoices()
       await processNodes()
-      //await updateBlockchainSnapshot()
+      // await updateBlockchainSnapshot()
     } catch (err) {
       console.log(err)
     }
@@ -56,6 +62,7 @@ async function processNodes() {
     try {
       await processNode(node)
     } catch (err) {
+      console.log(err)
       node.status = "error"
       await node.save()
     }
@@ -71,7 +78,7 @@ async function updateBlockchainSnapshot() {
   const sourceDiskName = appsettings.source_blockchain_disk
 
   // Verify snapshot is stale to continue
-  const snapshotRes = await gcloudDisks.getSnapshot(
+  const snapshotRes = await gcloud.snapshots.get(
     project,
     appsettings.source_blockchain_snapshot
   )
@@ -88,7 +95,7 @@ async function updateBlockchainSnapshot() {
 
   // Wait for deployment to scale down
   while (true) {
-    const isDiskAttached = await gcloudDisks.isDiskAttached(
+    const isDiskAttached = await gcloud.disks.isAttached(
       project,
       zone,
       sourceDiskName
@@ -103,7 +110,8 @@ async function updateBlockchainSnapshot() {
     .toISOString()
     .toLowerCase()
     .replace(/\:|\./g, "-")}`
-  await gcloudDisks.createSnapshotFromDisk(
+
+  const createSnapshotRes = await gcloud.snapshots.createFromDisk(
     project,
     zone,
     snapshotName,
@@ -112,7 +120,7 @@ async function updateBlockchainSnapshot() {
 
   // Wait for snapshot to complete
   while (true) {
-    const isSnapshotReady = await gcloudDisks.isSnapshotReady(
+    const isSnapshotReady = await gcloud.snapshots.isReady(
       project,
       snapshotName
     )

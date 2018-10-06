@@ -1,5 +1,6 @@
 "use strict"
 const User = require("../../models/users")
+const Appsettings = require("../../models/appsettings")
 
 /**
  * @api {post} /users Create a new user
@@ -41,6 +42,11 @@ const User = require("../../models/users")
  */
 
 const createUser = async ctx => {
+  const appsettings = await Appsettings.getAppsettingsForEnv()
+  if (ctx.request.body.user.invite_code !== appsettings.invite_code) {
+    ctx.throw(401, "Invite code required")
+  }
+
   const user = new User(ctx.request.body.user)
   try {
     await user.save()

@@ -13,6 +13,7 @@ const User = new mongoose.Schema({
   email_confirmed: { type: Boolean },
   password: { type: String, required: true },
   nodes: [{ type: Schema.Types.ObjectId, ref: "Node" }],
+  invite_code: { type: String },
   created_at: { type: Date, default: Date.now }
 })
 
