@@ -9,7 +9,12 @@ const Appsettings = new mongoose.Schema({
     tier: { type: String },
     status: { type: String },
     private: { type: Boolean },
-    services: [{ type: String }],
+    services: [
+      {
+        name: { type: String },
+        url: { type: String }
+      }
+    ],
     pruned: { type: Boolean },
     clone_blockchain: { type: Boolean },
     disk_size_gb_full: { type: String },
@@ -40,7 +45,8 @@ const Appsettings = new mongoose.Schema({
     project: { type: String },
     region: { type: String },
     zone: { type: String }
-  }
+  },
+  invite_code: { type: String },
 })
 
 Appsettings.statics.getAppsettingsForEnv = async function() {
