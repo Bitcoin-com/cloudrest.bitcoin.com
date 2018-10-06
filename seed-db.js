@@ -13,7 +13,7 @@ const data = [
           flavor: "bu",
           tier: "standard",
           private: true,
-          services: ["rest"],
+          services: [{ name: "rest" }],
           pruned: false,
           clone_blockchain: true,
           disk_size_gb_full: "220",
@@ -26,7 +26,10 @@ const data = [
           },
           {
             name: "bu",
-            image: "zquestz/bitcoin-unlimited"
+            image: "zquestz/bitcoin-unlimited",
+            defaults: {
+              services: [{ name: "wormholerest" }]
+            }
           },
           {
             name: "xt",
@@ -36,7 +39,7 @@ const data = [
             name: "wormhole",
             image: "spendbch/wormhole:0.1.0",
             defaults: {
-              services: ["wormholerest"]
+              services: [{ name: "wormholerest" }]
             }
           },
           {
@@ -44,7 +47,7 @@ const data = [
             image: ""
           }
         ],
-        source_blockchain_snapshot: "bch-data-2018-09-25t05-50-58-027z",
+        source_blockchain_snapshot: "bch-data-2018-10-05t23-28-52-324z",
         source_blockchain_deploy: "source-blockchain-deploy",
         source_blockchain_disk: "source-blockchain-disk",
         services: [
@@ -66,7 +69,8 @@ const data = [
           project: "bitbox-cloud-stage",
           region: "us-central1",
           zone: "us-central1-a"
-        }
+        },
+        invite_code: "your_invite_code",
       }
     ]
   }
